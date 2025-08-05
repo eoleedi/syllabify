@@ -13,7 +13,7 @@ except PackageNotFoundError:
 
 # These imports might fail if the files aren't ready yet, so we'll handle gracefully
 try:
-    from .syllable import generate, get_raw
+    from .syllable import generate, generate_sentence, get_raw
     from .cmu_parser import CMUtranscribe
     from .syllable_types import (
         Cluster,
@@ -27,6 +27,7 @@ try:
 
     __all__ = [
         "generate",
+        "generate_sentence",
         "get_raw",
         "CMUtranscribe",
         "Cluster",
