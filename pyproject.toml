@@ -1,0 +1,73 @@
+[project]
+name = "syllabify"
+version = "0.1.0"
+description = "Automatically convert plain text into phonemes (US English pronunciation) and syllabify"
+authors = [
+    { name = "Fong-Chun Tsai", email = "eoleedimin@gmail.com" },
+    { name = "Andrew Caines", email = "cainesap@gmail.com" },
+    { name = "Anthony Evans" }
+]
+license = "MIT"
+readme = "README.md"
+keywords = ["phonetics", "syllabification", "linguistics", "cmu", "pronunciation"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Text Processing :: Linguistic",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+requires-python = ">=3.9"
+dynamic = ["dependencies"]
+
+[project.urls]
+Homepage = "https://github.com/eoleedi/syllabify"
+Repository = "https://github.com/eoleedi/syllabify"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry]
+packages = [{ include = "syllabify" }]
+include = ["syllabify/CMU_dictionary/*"]
+
+[tool.poetry.group.dev.dependencies]
+black = "^25.0"
+flake8 = "^7.0"
+mypy = "^1.0"
+
+[tool.poetry.scripts]
+syllabify = "syllabify.cli:main"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
