@@ -37,6 +37,7 @@ packages = [{ include = "syllabify" }]
 include = ["syllabify/CMU_dictionary/*"]
 
 [tool.poetry.group.dev.dependencies]
+pre-commit = "^4.2.0"
 black = "^25.0"
 flake8 = "^7.0"
 mypy = "^1.0"

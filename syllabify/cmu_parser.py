@@ -18,6 +18,7 @@ VERSION = "cmudict.0.7a"
 # Path
 PATH_TO_DICTIONARY = os.path.join(CMU_DIR, VERSION)
 
+
 class CMUDictionary:
     """CMU Dictionary parser and interface"""
 
@@ -26,28 +27,31 @@ class CMUDictionary:
             r"""
                         (?P<Comment>;;;.*) # ;;; denotes Comment: to be ignore
                         |(?P<Word>'?\w+[^\(\)]*) # Not interested in first character
-                        (?P<Alternative> \(\d+\))? # (digit) denotes that another 
+                        (?P<Alternative> \(\d+\))? # (digit) denotes that another
                         (?P<Seperator> \s\s) # Separator: to be ignored
-                        (?P<Phoneme> [^\n]+) # The remainder 
+                        (?P<Phoneme> [^\n]+) # The remainder
                      """,
             re.VERBOSE,
         )
 
         # import CMU dictionary
         try:
-            self.cmudict_file = open(path_to_dictionary, "r", encoding="latin-1")
+            with open(path_to_dictionary, "r", encoding="latin-1") as self.cmudict_file:
+                # create Python CMU dictionary
+                self._cmudict = self._create_dictionary()
         except IOError as e:
             print(e, "file not found, check settings...")
             raise
-        # create Python CMU dictionary
-        self._cmudict = self._create_dictionary()
-        self.cmudict_file.close()
 
     def __getitem__(self, key):
         try:
             return self._cmudict[key.upper()]
         except (KeyError, UnicodeDecodeError):
             return None
+
+    def get_dictionary(self):
+        """Get the CMU dictionary"""
+        return self._cmudict
 
     def _create_dictionary(self):
         dict_temp = {}
@@ -96,9 +100,11 @@ class Transcription:
         )
 
     def append(self, phoneme):
+        """Append phoneme to representation"""
         self.representation.append(Phoneme(phoneme))
 
     def get_phonemic_representations(self):
+        """Return all the phonemes that can represent this word"""
         # return all the phonemes that can represent this word
         return [x.phoneme for x in self.representation]
 
@@ -107,7 +113,7 @@ class Transcription:
 cmudict = CMUDictionary()
 
 
-def CMUtranscribe(word):
+def cmu_transcribe(word):
     """Transcribe a word using CMU dictionary"""
     try:
         transcription = cmudict[word]
@@ -121,21 +127,23 @@ def CMUtranscribe(word):
 
 def test_word(word):
     """Test function for a single word"""
-    return CMUtranscribe(word)
+    return cmu_transcribe(word)
 
 
 def test():
     """Test Function - prints the transcription of 100 words"""
     try:
-        with open("./CMU_dictionary/american-english", "r") as words_file:
+        with open(
+            "./CMU_dictionary/american-english", "r", encoding="utf-8"
+        ) as words_file:
             words = words_file.readlines()
     except FileNotFoundError:
         print("american-english file not found, using sample words")
         words = ["hello\n", "world\n", "python\n", "linguistics\n"]
 
-    for i in range(min(100, len(words))):
+    for _ in range(min(100, len(words))):
         word = random.choice(words)[:-1]
-        syllable = CMUtranscribe(word)
+        syllable = cmu_transcribe(word)
         if syllable:
             transcriptions = 0
             output = word

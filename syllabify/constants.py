@@ -1,3 +1,7 @@
+"""
+Constants for syllabification including vowel type definitions.
+"""
+
 from typing import Dict
 
 VOWEL_TYPES: Dict[str, Dict[str, str]] = {

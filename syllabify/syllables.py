@@ -19,9 +19,11 @@ class Cluster:
         self.comparator = self.get_phoneme_string()
 
     def get_phoneme(self) -> List[Union[Vowel, Consonant]]:
+        """Get the list of phonemes in this cluster."""
         return self.phoneme_list
 
     def get_phoneme_string(self) -> str:
+        """Get string representation of all phonemes in this cluster."""
         # syllable without an onset, or coda has a phoneme of '' empty string
         string = ""
         for ph in self.phoneme_list:
@@ -33,13 +35,16 @@ class Cluster:
         self.add_phoneme(phoneme)
 
     def add_phoneme(self, phoneme: Union[Vowel, Consonant]) -> None:
+        """Add a phoneme to this cluster."""
         self.phoneme_list.append(phoneme)
         self._update_comparator()
 
     def _update_comparator(self) -> None:
+        """Update the comparator string after adding phonemes."""
         self.comparator = self.get_phoneme_string()
 
     def get_stress(self) -> str:
+        """Get the stress level of this cluster (only applicable for vowel clusters)."""
         if self.type() == Vowel:
             # mapping function that returns the stress value of a Vowel
             def get_phoneme_stress(x):
@@ -55,13 +60,13 @@ class Cluster:
 
     def type(self) -> Optional[type]:
         """returns the type of the phoneme cluster: either Vowel, or Consonant"""
-        if self.phoneme_list == []:
+        if not self.phoneme_list:
             return None
-        else:
-            return type(self.phoneme_list[-1])
+        return type(self.phoneme_list[-1])
 
     # Boolean Methods
     def is_short(self) -> bool:
+        """Check if this cluster represents a short vowel."""
         if self.type() == Vowel:
             # Rule for determining if vowel is short
             return (
@@ -70,10 +75,12 @@ class Cluster:
         return False
 
     def is_long(self) -> bool:
+        """Check if this cluster represents a long vowel."""
         return not self.is_short()
 
     def has_phoneme(self) -> bool:
-        return bool(self.phoneme_list != [])
+        """Check if this cluster contains any phonemes."""
+        return bool(self.phoneme_list)
 
     def __eq__(self, other: object) -> bool:
         """compare cluster objects"""
@@ -87,7 +94,7 @@ class Cluster:
         return True
 
     def __bool__(self) -> bool:
-        return self.phoneme_list != []
+        return bool(self.phoneme_list)
 
     def __str__(self) -> str:
         return functools.reduce(lambda x, y: str(x) + str(y), self.phoneme_list, "")
@@ -107,6 +114,7 @@ class Empty:
         return "empty"
 
     def has_phoneme(self) -> bool:
+        """Check if this empty cluster has any phonemes (always False)."""
         return False
 
     def __bool__(self) -> bool:
@@ -140,28 +148,36 @@ class Syllable:
 
     # Setters
     def set_onset(self, cluster: Union[Cluster, Empty]) -> None:
+        """Set the onset cluster for this syllable."""
         self.onset = cluster
 
     def set_nucleus(self, cluster: Union[Cluster, Empty]) -> None:
+        """Set the nucleus cluster for this syllable."""
         self.rime.set_nucleus(cluster)
 
     def set_coda(self, cluster: Union[Cluster, Empty]) -> None:
+        """Set the coda cluster for this syllable."""
         self.rime.set_coda(cluster)
 
     # Getters
     def get_onset(self) -> Union[Cluster, Empty]:
+        """Get the onset cluster of this syllable."""
         return self.onset
 
     def get_nucleus(self) -> Union[Cluster, Empty]:
+        """Get the nucleus cluster of this syllable."""
         return self.rime.get_nucleus()
 
     def get_coda(self) -> Union[Cluster, Empty]:
+        """Get the coda cluster of this syllable."""
         return self.rime.get_coda()
 
     def get_stress(self) -> str:
+        """Get the stress level of this syllable."""
         return self.rime.get_stress()
 
     def get_rime(self) -> "Rime":
+        """Get the rime (nucleus + coda) of this syllable."""
         return self.rime
 
     # def get_phoneme(self) -> List[Union[Cluster, Empty]]:
@@ -186,9 +202,11 @@ class Syllable:
 
     # Boolean Methods
     def is_light(self) -> bool:
+        """Check if this syllable is light (short vowel and no coda)."""
         return self.is_short() and self.coda_is_empty()
 
     def is_short(self) -> bool:
+        """Check if this syllable has a short vowel."""
         return (
             self.rime.nucleus.is_short()
             if hasattr(self.rime.nucleus, "is_short")
@@ -196,6 +214,7 @@ class Syllable:
         )
 
     def has_onset(self) -> bool:
+        """Check if this syllable has an onset."""
         return (
             bool(self.onset.has_phoneme())
             if hasattr(self.onset, "has_phoneme")
@@ -203,18 +222,23 @@ class Syllable:
         )
 
     def onset_is_empty(self) -> bool:
+        """Check if this syllable's onset is empty."""
         return not self.has_onset()
 
     def has_nucleus(self) -> bool:
+        """Check if this syllable has a nucleus."""
         return self.rime.has_nucleus()
 
     def nucleus_is_empty(self) -> bool:
+        """Check if this syllable's nucleus is empty."""
         return not self.has_nucleus()
 
     def has_coda(self) -> bool:
+        """Check if this syllable has a coda."""
         return self.rime.has_coda()
 
     def coda_is_empty(self) -> bool:
+        """Check if this syllable's coda is empty."""
         return not self.rime.has_coda()
 
     def __str__(self) -> str:
@@ -247,9 +271,11 @@ class Word:
         self.syllables: List[Syllable] = syllables if syllables else []
 
     def add_syllable(self, syllable: Syllable) -> None:
+        """Add a syllable to this word."""
         self.syllables.append(syllable)
 
     def get_syllables(self) -> List[Syllable]:
+        """Get the list of syllables in this word."""
         return self.syllables
 
     def __str__(self) -> str:
@@ -266,9 +292,11 @@ class Sentence:
         self.words: List[Word] = words if words else []
 
     def add_word(self, word: Word) -> None:
+        """Add a word to this sentence."""
         self.words.append(word)
 
     def get_words(self) -> List[Word]:
+        """Get the list of words in this sentence."""
         return self.words
 
     def __str__(self) -> str:
@@ -291,13 +319,16 @@ class Rime:
 
     # Setters
     def set_nucleus(self, cluster: Union[Cluster, Empty]) -> None:
+        """Set the nucleus cluster of this rime."""
         self.nucleus = cluster
 
     def set_coda(self, cluster: Union[Cluster, Empty]) -> None:
+        """Set the coda cluster of this rime."""
         self.coda = cluster
 
     # Boolean Methods
     def has_nucleus(self) -> bool:
+        """Check if this rime has a nucleus."""
         return (
             bool(self.nucleus.has_phoneme())
             if hasattr(self.nucleus, "has_phoneme")
@@ -305,6 +336,7 @@ class Rime:
         )
 
     def has_coda(self) -> bool:
+        """Check if this rime has a coda."""
         return (
             bool(self.coda.has_phoneme())
             if hasattr(self.coda, "has_phoneme")
@@ -312,10 +344,13 @@ class Rime:
         )
 
     def get_nucleus(self) -> Union[Cluster, Empty]:
+        """Get the nucleus cluster of this rime."""
         return self.nucleus
 
     def get_coda(self) -> Union[Cluster, Empty]:
+        """Get the coda cluster of this rime."""
         return self.coda
 
     def get_stress(self) -> str:
+        """Get the stress level of this rime's nucleus."""
         return self.nucleus.get_stress() if hasattr(self.nucleus, "get_stress") else "0"

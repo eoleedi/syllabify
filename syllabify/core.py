@@ -8,10 +8,35 @@ import copy
 import functools
 from typing import List
 
-from syllabify.cmu_parser import CMUtranscribe
+from syllabify.cmu_parser import cmu_transcribe
 from syllabify.syllables import Cluster, Syllable, Word, Sentence
 from syllabify.phonemes import Vowel, Consonant
-from syllabify.symbols import *
+from syllabify.symbols import (
+    NG,
+    HH,
+    W,
+    Y,
+    S,
+    CH,
+    JH,
+    DH,
+    F,
+    SH,
+    TH,
+    V,
+    ZH,
+    Z,
+    B,
+    D,
+    G,
+    K,
+    P,
+    T,
+    M,
+    N,
+    L,
+    R,
+)
 
 
 phoneme_classify = re.compile(
@@ -26,156 +51,160 @@ phoneme_classify = re.compile(
 )
 
 
+def _create_phoneme_object(phoneme):
+    """Create a phoneme object from a phoneme string."""
+    # match against regular expression
+    phoneme_feature = re.match(phoneme_classify, phoneme).groupdict()
+
+    # input is phoneme feature dictionary
+    if phoneme_feature["Consonant"]:
+        # return consonant object
+        return Consonant(**phoneme_feature)
+    if phoneme_feature["Vowel"]:
+        # return vowel object
+        return Vowel(**phoneme_feature)
+    # unknown phoneme class
+    raise ValueError("unknown Phoneme Class: cannot create appropriate Phoneme object")
+
+
+def _create_cluster(cluster_list, phoneme):
+    """Create phoneme clusters from individual phonemes."""
+    current_cluster = cluster_list.pop()
+
+    # Consonants must be grouped together into clusters
+    if (
+        current_cluster.type() == Consonant
+        and isinstance(phoneme, Consonant)
+        or current_cluster.type() is None
+    ):
+        # Adjacent phonemes of type consonant belong to the same cluster, if the
+        # current cluster.last_phoneme == None that means it's empty
+        # update current cluster
+        # AC 2017-08-12: provided it's not NG (should not be clustered)
+        if NG in current_cluster.get_phoneme_string():
+            # create new cluster add phoneme to it and return
+            cluster_list.append(current_cluster)
+            cluster_list.append(Cluster(phoneme))
+        else:
+            current_cluster.add_phoneme(phoneme)
+            # append to cluster list
+            cluster_list.append(current_cluster)
+        # return cluster list
+        return cluster_list
+    # create new cluster add phoneme to it and return
+    cluster_list.append(current_cluster)
+    cluster_list.append(Cluster(phoneme))
+    return cluster_list
+
+
+def _create_syllable(syllable_list, cluster):
+    """Create syllables from phoneme clusters."""
+    syllable = syllable_list.pop()
+    push = syllable_list.append
+
+    if (
+        syllable.onset_is_empty()
+        and syllable.nucleus_is_empty()
+        and cluster.type() == Consonant
+    ):
+        # cluster is assigned to the onset of the current syllable
+        syllable.set_onset(cluster)
+        push(syllable)
+        return syllable_list
+
+    if cluster.type() == Vowel:
+        if syllable.has_nucleus():
+            # this cluster becomes the nucleus of a new syllable
+            # push current syllable back on the syllable stack
+            push(syllable)
+            # create new syllable
+            new_syllable = Syllable(nucleus=cluster)
+            # push new_syllable onto the stack
+            push(new_syllable)
+            return syllable_list
+        # syllable does not have nucleus so this cluster becomes the
+        # nucleus on the current syllable
+        syllable.set_nucleus(cluster)
+        push(syllable)
+        return syllable_list
+
+    if syllable.has_nucleus() and cluster.type() == Consonant:
+        if syllable.has_coda():
+            # this cluster is the onset of the next syllable
+            new_syllable = Syllable(onset=cluster)
+            # push syllable onto stack
+            push(new_syllable)
+            return syllable_list
+        if syllable.coda_is_empty():
+            # Onset Maximalism dictates we push consonant clusters to
+            # the onset of the next syllable, unless the nuclear cluster is LIGHT and
+            # has primary stress
+            maximal_coda, maximal_onset = onset_rules(cluster)
+
+            # AC 2017-09-15: removed ambisyllabicity as a theoretical stance
+            # add cluster only to the next syllable
+            if maximal_coda:
+                syllable.set_coda(maximal_coda)
+                push(syllable)
+            else:
+                push(syllable)
+            if maximal_onset:
+                new_syllable = Syllable(onset=maximal_onset)
+            else:
+                new_syllable = Syllable()
+            push(new_syllable)
+            return syllable_list
+    return syllable_list  # Add explicit return for consistency
+
+
+def _validate_last_syllable(syllable_list):
+    """Validate and fix the last syllable in the list."""
+    # the syllable algorithm may assign a consonant cluster to a syllable that does not have
+    # a nucleus, this is not allowed in the English language.
+
+    # check the last syllable
+    syllable = syllable_list.pop()
+    push = syllable_list.append
+
+    if syllable.nucleus_is_empty():
+        if syllable.has_onset():
+            # pop the previous syllable
+            prev_syllable = syllable_list.pop()
+            onset = syllable.get_onset()
+            # set the coda of the previous syllable to the value of the orphan onset
+            if prev_syllable.has_coda():
+                # add phoneme
+                coda_cluster = prev_syllable.get_coda()
+                if coda_cluster != onset:
+                    for phoneme in onset.phoneme_list:
+                        coda_cluster.add_phoneme(phoneme)
+                    push(prev_syllable)
+                else:
+                    push(prev_syllable)
+            else:
+                prev_syllable.set_coda(onset)
+                push(prev_syllable)
+        return syllable_list
+    # There is no violation, push syllable back on the stack
+    push(syllable)
+
+    return syllable_list
+
+
 def factory(phoneme):
     """argument is a string of phonemes e.g.'B IH0 K AH0 Z'"""
     phoneme_list = phoneme.split()
 
-    def phoneme_fact(phoneme):
-        # match against regular expression
-        phoneme_feature = re.match(phoneme_classify, phoneme).groupdict()
-
-        # input is phoneme feature dictionary
-        if phoneme_feature["Consonant"]:
-            # return consonant object
-            return Consonant(**phoneme_feature)
-        elif phoneme_feature["Vowel"]:
-            # return vowel object
-            return Vowel(**phoneme_feature)
-        else:
-            # unknown phoneme class
-            raise Exception(
-                "unknown Phoneme Class: cannot create appropriate Phoneme object"
-            )
-
-    def cluster_fact(cluster_list, phoneme):
-        current_cluster = cluster_list.pop()
-
-        # Consonants must be grouped together into clusters
-        if (
-            current_cluster.type() == Consonant
-            and type(phoneme) == Consonant
-            or current_cluster.type() is None
-        ):
-            # Adjacent phonemes of type consonant belong to the same cluster, if the
-            # current cluster.last_phoneme == None that means it's empty
-            # update current cluster
-            # AC 2017-08-12: provided it's not NG (should not be clustered)
-            if NG in current_cluster.get_phoneme_string():
-                # create new cluster add phoneme to it and return
-                cluster_list.append(current_cluster)
-                cluster_list.append(Cluster(phoneme))
-            else:
-                current_cluster.add_phoneme(phoneme)
-                # append to cluster list
-                cluster_list.append(current_cluster)
-            # return cluster list
-            return cluster_list
-        else:
-            # create new cluster add phoneme to it and return
-            cluster_list.append(current_cluster)
-            cluster_list.append(Cluster(phoneme))
-            return cluster_list
-
-    def syllable_fact(syllable_list, cluster):
-        syllable = syllable_list.pop()
-        push = syllable_list.append
-
-        if (
-            syllable.onset_is_empty()
-            and syllable.nucleus_is_empty()
-            and cluster.type() == Consonant
-        ):
-            # cluster is assigned to the onset of the current syllable
-            syllable.set_onset(cluster)
-            push(syllable)
-            return syllable_list
-
-        if cluster.type() == Vowel:
-            if syllable.has_nucleus():
-                # this cluster becomes the nucleus of a new syllable
-                # push current syllable back on the syllable stack
-                push(syllable)
-                # create new syllable
-                new_syllable = Syllable(nucleus=cluster)
-                # push new_syllable onto the stack
-                push(new_syllable)
-                return syllable_list
-            else:
-                # syllable does not have nucleus so this cluster becomes the
-                # nucleus on the current syllable
-                syllable.set_nucleus(cluster)
-                push(syllable)
-                return syllable_list
-
-        if syllable.has_nucleus() and cluster.type() == Consonant:
-            if syllable.has_coda():
-                # this cluster is the onset of the next syllable
-                new_syllable = Syllable(onset=cluster)
-                # push syllable onto stack
-                push(new_syllable)
-                return syllable_list
-            elif syllable.coda_is_empty():
-                # Onset Maximalism dictates we push consonant clusters to
-                # the onset of the next syllable, unless the nuclear cluster is LIGHT and
-                # has primary stress
-                maximal_coda, maximal_onset = onset_rules(cluster)
-
-                # AC 2017-09-15: removed ambisyllabicity as a theoretical stance
-                # add cluster only to the next syllable
-                if maximal_coda:
-                    syllable.set_coda(maximal_coda)
-                    push(syllable)
-                else:
-                    push(syllable)
-                if maximal_onset:
-                    new_syllable = Syllable(onset=maximal_onset)
-                else:
-                    new_syllable = Syllable()
-                push(new_syllable)
-                return syllable_list
-
-    def check_last_syllable(syllable_list):
-        # the syllable algorithm may assign a consonant cluster to a syllable that does not have
-        # a nucleus, this is not allowed in the English language.
-
-        # check the last syllable
-        syllable = syllable_list.pop()
-        push = syllable_list.append
-
-        if syllable.nucleus_is_empty():
-            if syllable.has_onset():
-                # pop the previous syllable
-                prev_syllable = syllable_list.pop()
-                onset = syllable.get_onset()
-                # set the coda of the previous syllable to the value of the orphan onset
-                if prev_syllable.has_coda():
-                    # add phoneme
-                    coda_cluster = prev_syllable.get_coda()
-                    if coda_cluster != onset:
-                        for phoneme in onset.phoneme_list:
-                            coda_cluster.add_phoneme(phoneme)
-                        push(prev_syllable)
-                    else:
-                        push(prev_syllable)
-                else:
-                    prev_syllable.set_coda(onset)
-                    push(prev_syllable)
-        else:
-            # There is no violation, push syllable back on the stack
-            push(syllable)
-
-        return syllable_list
-
     # Create a list of phoneme clusters from phoneme list
     cluster_list = functools.reduce(
-        cluster_fact, map(phoneme_fact, phoneme_list), [Cluster()]
+        _create_cluster, map(_create_phoneme_object, phoneme_list), [Cluster()]
     )
 
     # Apply syllable creation rules to list of phoneme clusters
-    syllable_list = functools.reduce(syllable_fact, cluster_list, [Syllable()])
+    syllable_list = functools.reduce(_create_syllable, cluster_list, [Syllable()])
 
     # Validate last syllable, and return completed syllable list
-    return check_last_syllable(syllable_list)
+    return _validate_last_syllable(syllable_list)
 
 
 def coda_rules(cluster):
@@ -190,18 +219,20 @@ def coda_rules(cluster):
     for phone in phonemelist:
         list_of_phonemes.append(phone.rstrip())
 
-    def _split_and_update(
-        phoneme, phonemes=list_of_phonemes, coda_cluster=coda_cluster
-    ):
+    def _split_and_update(phoneme, phonemes=None, cluster=None):
+        if phonemes is None:
+            phonemes = list_of_phonemes.copy()
+        if cluster is None:
+            cluster = coda_cluster
         index = phonemes.index(phoneme)
         # split on phoneme and discard the rest
-        head = coda_cluster.phoneme_list[: index - 1]
+        head = cluster.phoneme_list[: index - 1]
         # update cluster
-        coda_cluster.phoneme_list = head
+        cluster.phoneme_list = head
         # update string list
         phonemes = phonemes[: index - 1]
 
-        return (phonemes, coda_cluster)
+        return (phonemes, cluster)
 
     # rule 1 - no /HH/ in coda
     if HH in list_of_phonemes:
@@ -234,7 +265,8 @@ def coda_rules(cluster):
 
     return coda_cluster
 
-def onset_rules(cluster):
+
+def onset_rules(cluster):  # pylint: disable=too-many-branches
     """checks if the cluster is a valid onset or whether it needs to be split"""
 
     phonemes = map(str, cluster.get_phoneme())
@@ -246,11 +278,9 @@ def onset_rules(cluster):
         list_of_phonemes.append(phone.rstrip())
     coda_cluster = Cluster()
 
-    def _split_and_update(
-        phoneme, phonemes=list_of_phonemes, coda_cluster=coda_cluster
-    ):
+    def _split_and_update(phoneme):
         # get index of phoneme
-        index = phonemes.index(phoneme)
+        index = list_of_phonemes.index(phoneme)
         # split on phoneme and add tail coda cluster
         tail = cluster.phoneme_list[:index]
         # remaining phonemes
@@ -260,10 +290,10 @@ def onset_rules(cluster):
         # update cluster
         cluster.phoneme_list = head
         # update string list
-        phonemes = phonemes[index:]
-        return (phonemes, coda_cluster)
+        updated_phonemes = list_of_phonemes[index:]
+        return (updated_phonemes, coda_cluster)
 
-    def _remove_and_update(phonemes=list_of_phonemes, coda_cluster=coda_cluster):
+    def _remove_and_update():
         head = cluster.phoneme_list[0]
         rest = cluster.phoneme_list[1:]
         # extend list
@@ -271,8 +301,8 @@ def onset_rules(cluster):
         # update cluster
         cluster.phoneme_list = rest
         # update string list
-        phonemes = phonemes[1:]
-        return (phonemes, coda_cluster)
+        updated_phonemes = list_of_phonemes[1:]
+        return (updated_phonemes, coda_cluster)
 
     # rule 1 - /NG/ cannot exist in a valid onset
     # does /NG? exist? split on NG add NG to coda
@@ -291,7 +321,7 @@ def onset_rules(cluster):
 
     # rule 3 - first consonant in a complex onset must be obstruent
     # if first consonant stop or fricative or nasal
-    if len(list_of_phonemes) > 1 and not list_of_phonemes[0] in [
+    if len(list_of_phonemes) > 1 and list_of_phonemes[0] not in [
         B,
         D,
         G,
@@ -314,8 +344,8 @@ def onset_rules(cluster):
     # if not OBSTRUENT and VOICED? split on second consonant
     if (
         len(list_of_phonemes) > 1
-        and not list_of_phonemes[0] == S
-        and not list_of_phonemes[1] in [B, M, V, D, N, Z, ZH, R, Y]
+        and list_of_phonemes[0] != S
+        and list_of_phonemes[1] not in [B, M, V, D, N, Z, ZH, R, Y]
     ):
         list_of_phonemes, coda_cluster = _remove_and_update()
 
@@ -323,8 +353,8 @@ def onset_rules(cluster):
     # the second consonant must be liquid or glide /L/ /R/ /W/ /Y/
     if (
         len(list_of_phonemes) > 1
-        and not list_of_phonemes[0] == S
-        and not list_of_phonemes[1] in [L, R, W, Y]
+        and list_of_phonemes[0] != S
+        and list_of_phonemes[1] not in [L, R, W, Y]
         and len(list_of_phonemes) < 3
     ):
         list_of_phonemes, coda_cluster = _remove_and_update()
@@ -362,35 +392,34 @@ def syllabify(input_data) -> Word | Sentence | List[Sentence]:
     """
     Enhanced syllabify function that supports:
     - Single word (str) -> Word object
-    - Single sentence (str) -> Sentence object  
+    - Single sentence (str) -> Sentence object
     - List of sentences (List[str]) -> List[Sentence] objects
     """
-    
+
     if isinstance(input_data, str):
         # Check if input contains multiple words
         words = input_data.strip().split()
-        
+
         if len(words) == 1:
             # Single word processing
-            phoneme_list = CMUtranscribe(words[0])
+            phoneme_list = cmu_transcribe(words[0])
             if phoneme_list:
                 syllables = factory(phoneme_list[0])  # first version only
                 return Word(syllables) if syllables else None
-            else:
-                print(words[0] + " not in CMU dictionary, sorry, please try again...")
-                return None
-        else:
-            # Multiple words processing (sentence)
-            word_objects = []
-            for word in words:
-                phoneme_list = CMUtranscribe(word.rstrip())
-                if phoneme_list:
-                    syllables = factory(phoneme_list[0])
-                    if syllables:
-                        word_objects.append(Word(syllables))
-            return Sentence(word_objects) if word_objects else None
-    
-    elif isinstance(input_data, list):
+            print(words[0] + " not in CMU dictionary, sorry, please try again...")
+            return None
+
+        # Multiple words processing (sentence)
+        word_objects = []
+        for word in words:
+            phoneme_list = cmu_transcribe(word.rstrip())
+            if phoneme_list:
+                syllables = factory(phoneme_list[0])
+                if syllables:
+                    word_objects.append(Word(syllables))
+        return Sentence(word_objects) if word_objects else None
+
+    if isinstance(input_data, list):
         # List of sentences processing
         sentence_objects = []
         for sentence_str in input_data:
@@ -402,10 +431,10 @@ def syllabify(input_data) -> Word | Sentence | List[Sentence]:
                     # Single word treated as sentence with one word
                     sentence_objects.append(Sentence([sentence_result]))
         return sentence_objects
-    
-    else:
-        raise TypeError("Input must be a string or list of strings")
+
+    raise TypeError("Input must be a string or list of strings")
+
 
 def get_raw(word):
     """Get raw phoneme transcription"""
-    return CMUtranscribe(word)
+    return cmu_transcribe(word)

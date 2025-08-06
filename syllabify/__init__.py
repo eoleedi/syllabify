@@ -6,6 +6,7 @@ using the CMU Pronouncing Dictionary.
 """
 
 from importlib.metadata import version, PackageNotFoundError
+
 try:
     __version__ = version("syllabify")
 except PackageNotFoundError:
@@ -14,7 +15,7 @@ except PackageNotFoundError:
 # These imports might fail if the files aren't ready yet, so we'll handle gracefully
 try:
     from syllabify.core import syllabify
-    from syllabify.cmu_parser import CMUtranscribe
+    from syllabify.cmu_parser import cmu_transcribe
     from syllabify.symbols import (
         Vowel,
         Consonant,
@@ -31,7 +32,7 @@ try:
 
     __all__ = [
         "syllabify",
-        "CMUtranscribe",
+        "cmu_transcribe",
         "Cluster",
         "Consonant",
         "Vowel",
