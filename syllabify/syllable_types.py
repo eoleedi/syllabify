@@ -237,6 +237,24 @@ class Syllable:
         )
 
 
+class Word:
+    """Represents a word, which is a collection of syllables"""
+
+    def __init__(self, syllables: Optional[List[Syllable]] = None) -> None:
+        self.syllables: List[Syllable] = syllables if syllables else []
+
+    def add_syllable(self, syllable: Syllable) -> None:
+        self.syllables.append(syllable)
+
+    def get_syllables(self) -> List[Syllable]:
+        return self.syllables
+
+    def __str__(self) -> str:
+        return " ".join(str(s) for s in self.syllables)
+
+    def __repr__(self) -> str:
+        return "Word(syllables=[" + ", ".join(repr(s) for s in self.syllables) + "])"
+
 class Rime:
     """Rime Class"""
 

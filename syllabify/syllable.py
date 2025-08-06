@@ -9,8 +9,9 @@ import sys
 import random
 import functools
 from .cmu_parser import CMUtranscribe
-from .syllable_types import Cluster, Consonant, Vowel, Empty, Rime, Syllable
+from .syllable_types import Cluster, Consonant, Vowel, Empty, Rime, Syllable, Word
 from .phoneme_types import *
+from typing import List
 
 phoneme_classify = re.compile(
     r"""
@@ -364,17 +365,17 @@ def generate(word):
     else:
         print(word + " not in CMU dictionary, sorry, please try again...")
         return None
-    
+
 # generate syllables from a sentence
-def generate_sentence(sentence):
+def generate_sentence(sentence: str) -> List[Word]:
     """Generate syllables from a sentence using the CMU Pronouncing Dictionary"""
     words = sentence.split()
-    syllables = []
+    word_objects = []
     for word in words:
-        syllable = generate(word.rstrip())
-        if syllable:
-            syllables.extend(syllable)
-    return syllables
+        syllables = generate(word.rstrip())
+        if syllables:
+            word_objects.append(Word(syllables))
+    return word_objects
 
 def get_raw(word):
     """Get raw phoneme transcription"""
