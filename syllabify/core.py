@@ -108,7 +108,7 @@ def _create_syllable(syllable_list, cluster):
         and cluster.type() == Consonant
     ):
         # cluster is assigned to the onset of the current syllable
-        syllable.set_onset(cluster)
+        syllable.onset = cluster
         push(syllable)
         return syllable_list
 
@@ -124,7 +124,7 @@ def _create_syllable(syllable_list, cluster):
             return syllable_list
         # syllable does not have nucleus so this cluster becomes the
         # nucleus on the current syllable
-        syllable.set_nucleus(cluster)
+        syllable.nucleus = cluster
         push(syllable)
         return syllable_list
 
@@ -144,7 +144,7 @@ def _create_syllable(syllable_list, cluster):
             # AC 2017-09-15: removed ambisyllabicity as a theoretical stance
             # add cluster only to the next syllable
             if maximal_coda:
-                syllable.set_coda(maximal_coda)
+                syllable.coda = maximal_coda
                 push(syllable)
             else:
                 push(syllable)
@@ -170,19 +170,19 @@ def _validate_last_syllable(syllable_list):
         if syllable.has_onset():
             # pop the previous syllable
             prev_syllable = syllable_list.pop()
-            onset = syllable.get_onset()
+            onset = syllable.onset
             # set the coda of the previous syllable to the value of the orphan onset
             if prev_syllable.has_coda():
                 # add phoneme
-                coda_cluster = prev_syllable.get_coda()
+                coda_cluster = prev_syllable.coda
                 if coda_cluster != onset:
-                    for phoneme in onset.phoneme_list:
+                    for phoneme in onset.phonemes:
                         coda_cluster.add_phoneme(phoneme)
                     push(prev_syllable)
                 else:
                     push(prev_syllable)
             else:
-                prev_syllable.set_coda(onset)
+                prev_syllable.coda = onset
                 push(prev_syllable)
         return syllable_list
     # There is no violation, push syllable back on the stack
@@ -193,11 +193,11 @@ def _validate_last_syllable(syllable_list):
 
 def factory(phoneme):
     """argument is a string of phonemes e.g.'B IH0 K AH0 Z'"""
-    phoneme_list = phoneme.split()
+    phonemes = phoneme.split()
 
     # Create a list of phoneme clusters from phoneme list
     cluster_list = functools.reduce(
-        _create_cluster, map(_create_phoneme_object, phoneme_list), [Cluster()]
+        _create_cluster, map(_create_phoneme_object, phonemes), [Cluster()]
     )
 
     # Apply syllable creation rules to list of phoneme clusters
@@ -211,7 +211,7 @@ def coda_rules(cluster):
     """checks if the cluster is a valid onset or whether it needs to be split"""
 
     coda_cluster = copy.deepcopy(cluster)
-    phonemes = map(str, coda_cluster.get_phoneme())
+    phonemes = map(str, coda_cluster.phonemes)
     phonemelist = list(
         phonemes
     )  # grabbed list of phonemes to move away from Py3 map problem, and strip trailing spaces
@@ -226,9 +226,9 @@ def coda_rules(cluster):
             cluster = coda_cluster
         index = phonemes.index(phoneme)
         # split on phoneme and discard the rest
-        head = cluster.phoneme_list[: index - 1]
+        head = cluster.phonemes[: index - 1]
         # update cluster
-        cluster.phoneme_list = head
+        cluster.phonemes = head
         # update string list
         phonemes = phonemes[: index - 1]
 
@@ -254,13 +254,13 @@ def coda_rules(cluster):
     # rule 3 - if complex coda second consonant must not be
     # /NG/ /ZH/ /DH/
     if len(list_of_phonemes) > 1 and list_of_phonemes[1] in [NG, DH, ZH]:
-        phoneme = coda_cluster.phoneme_list[1]
+        phoneme = coda_cluster.phonemes[1]
         # update cluster
-        coda_cluster.phoneme_list = [phoneme]
+        coda_cluster.phonemes = [phoneme]
         # update string list
         phonemes = list_of_phonemes[0:1]
 
-    if coda_cluster.phoneme_list == []:
+    if coda_cluster.phonemes == []:
         coda_cluster = None
 
     return coda_cluster
@@ -269,7 +269,7 @@ def coda_rules(cluster):
 def onset_rules(cluster):  # pylint: disable=too-many-branches
     """checks if the cluster is a valid onset or whether it needs to be split"""
 
-    phonemes = map(str, cluster.get_phoneme())
+    phonemes = map(str, cluster.phonemes)
     phonemelist = list(
         phonemes
     )  # grabbed list of phonemes to move away from Py3 map problem, and strip trailing spaces
@@ -282,24 +282,24 @@ def onset_rules(cluster):  # pylint: disable=too-many-branches
         # get index of phoneme
         index = list_of_phonemes.index(phoneme)
         # split on phoneme and add tail coda cluster
-        tail = cluster.phoneme_list[:index]
+        tail = cluster.phonemes[:index]
         # remaining phonemes
-        head = cluster.phoneme_list[index:]
+        head = cluster.phonemes[index:]
         # extend list
-        coda_cluster.phoneme_list.extend(tail)
+        coda_cluster.phonemes.extend(tail)
         # update cluster
-        cluster.phoneme_list = head
+        cluster.phonemes = head
         # update string list
         updated_phonemes = list_of_phonemes[index:]
         return (updated_phonemes, coda_cluster)
 
     def _remove_and_update():
-        head = cluster.phoneme_list[0]
-        rest = cluster.phoneme_list[1:]
+        head = cluster.phonemes[0]
+        rest = cluster.phonemes[1:]
         # extend list
-        coda_cluster.phoneme_list.extend([head])
+        coda_cluster.phonemes.extend([head])
         # update cluster
-        cluster.phoneme_list = rest
+        cluster.phonemes = rest
         # update string list
         updated_phonemes = list_of_phonemes[1:]
         return (updated_phonemes, coda_cluster)
@@ -379,10 +379,10 @@ def onset_rules(cluster):  # pylint: disable=too-many-branches
             else:  # endless, handbag
                 list_of_phonemes, coda_cluster = _split_and_update(list_of_phonemes[2])
 
-    if coda_cluster.get_phoneme() == []:
+    if coda_cluster.phonemes == []:
         coda_cluster = None
 
-    if cluster.get_phoneme() == []:
+    if cluster.phonemes == []:
         cluster = None
 
     return (coda_cluster, cluster)
@@ -402,9 +402,9 @@ def syllabify(input_data) -> Word | Sentence | List[Sentence]:
 
         if len(words) == 1:
             # Single word processing
-            phoneme_list = cmu_transcribe(words[0])
-            if phoneme_list:
-                syllables = factory(phoneme_list[0])  # first version only
+            phonemes = cmu_transcribe(words[0])
+            if phonemes:
+                syllables = factory(phonemes[0])  # first version only
                 return Word(syllables) if syllables else None
             print(words[0] + " not in CMU dictionary, sorry, please try again...")
             return None
@@ -412,9 +412,9 @@ def syllabify(input_data) -> Word | Sentence | List[Sentence]:
         # Multiple words processing (sentence)
         word_objects = []
         for word in words:
-            phoneme_list = cmu_transcribe(word.rstrip())
-            if phoneme_list:
-                syllables = factory(phoneme_list[0])
+            phonemes = cmu_transcribe(word.rstrip())
+            if phonemes:
+                syllables = factory(phonemes[0])
                 if syllables:
                     word_objects.append(Word(syllables))
         return Sentence(word_objects) if word_objects else None
