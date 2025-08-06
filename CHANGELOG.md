@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.3.0](https://github.com/eoleedi/syllabify/compare/v0.2.0...v0.3.0) (2025-08-06)
+
+
+### Features
+
+* add get_phoneme function & refactor all the str function ([f294857](https://github.com/eoleedi/syllabify/commit/f294857e5f8d1196e3b382680ed4f06f5c21e24c))
+* prettify cli ([595881d](https://github.com/eoleedi/syllabify/commit/595881d029b5c24c6424ec826ae6ef93384b85dd))
+
+
+### Bug Fixes
+
+* cli ([cd21bc8](https://github.com/eoleedi/syllabify/commit/cd21bc8c7b1e3a7ae8cddf86a9eb50fbdc9a2e7b))
+
+
+### Documentation
+
+* update README.md ([f8f74f0](https://github.com/eoleedi/syllabify/commit/f8f74f099f77b620b0be2be50ba4abe9211badbd))
+
 ## [0.2.0](https://github.com/eoleedi/syllabify/compare/v0.1.0...v0.2.0) (2025-08-06)
 
 
