@@ -220,6 +220,7 @@ class Syllable:
 
     def __str__(self) -> str:
         return (
+            " ".join(map(str, self.get_phoneme())) + " "
             "{onset: "
             + str(self.onset)
             + ", nucleus: "
