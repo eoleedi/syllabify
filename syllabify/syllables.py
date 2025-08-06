@@ -3,40 +3,22 @@ Data types for syllabification
 """
 
 import functools
-from typing import List, Optional, Union, Any, Dict
+from typing import List, Optional, Union
 
-VOWEL_TYPES: Dict[str, Dict[str, str]] = {
-    # Short Vowels
-    "AO": {"length": "short"},
-    "UW": {"length": "short"},
-    "EH": {"length": "short"},
-    "AH": {"length": "short"},
-    "AA": {"length": "short"},
-    "IY": {"length": "short"},
-    "IH": {"length": "short"},
-    "UH": {"length": "short"},
-    "AE": {"length": "short"},
-    # Long Vowels
-    "AW": {"length": "long"},
-    "AY": {"length": "long"},
-    "ER": {"length": "long"},
-    "EY": {"length": "long"},
-    "OW": {"length": "long"},
-    "OY": {"length": "long"},
-}
+from syllabify.phonemes import Vowel, Consonant
 
 
 class Cluster:
     """Represents groups of phonemes. Clusters contain either Vowels, or Consonants - never both"""
 
-    def __init__(self, phoneme: Optional[Union["Vowel", "Consonant"]] = None) -> None:
-        self.phoneme_list: List[Union["Vowel", "Consonant"]] = []
+    def __init__(self, phoneme: Optional[Union[Vowel, Consonant]] = None) -> None:
+        self.phoneme_list: List[Union[Vowel, Consonant]] = []
         if phoneme:
             self.add_phoneme(phoneme)
         # all phonemes have a string representation
         self.comparator = self.get_phoneme_string()
 
-    def get_phoneme(self) -> List[Union["Vowel", "Consonant"]]:
+    def get_phoneme(self) -> List[Union[Vowel, Consonant]]:
         return self.phoneme_list
 
     def get_phoneme_string(self) -> str:
@@ -46,11 +28,11 @@ class Cluster:
             string += ph.phoneme
         return string
 
-    def add_phenome(self, phoneme: Union["Vowel", "Consonant"]) -> None:
+    def add_phenome(self, phoneme: Union[Vowel, Consonant]) -> None:
         """Legacy method name - use add_phoneme instead"""
         self.add_phoneme(phoneme)
 
-    def add_phoneme(self, phoneme: Union["Vowel", "Consonant"]) -> None:
+    def add_phoneme(self, phoneme: Union[Vowel, Consonant]) -> None:
         self.phoneme_list.append(phoneme)
         self._update_comparator()
 
@@ -109,7 +91,7 @@ class Cluster:
 
     def __str__(self) -> str:
         return functools.reduce(lambda x, y: str(x) + str(y), self.phoneme_list, "")
-    
+
     def __repr__(self) -> str:
         return "Cluster(" + str(self.get_phoneme_string()) + ")"
 
@@ -182,6 +164,26 @@ class Syllable:
     def get_rime(self) -> "Rime":
         return self.rime
 
+    # def get_phoneme(self) -> List[Union[Cluster, Empty]]:
+    #     """Returns a list of phoneme clusters in the syllable"""
+    #     # do not include Empty clusters
+    #     phonemes = []
+    #     if not self.onset_is_empty():
+    #         phonemes.extend([self.get_onset().get_phoneme_string()])
+    #     if not self.nucleus_is_empty():
+    #         phonemes.extend([self.get_nucleus().get_phoneme_string()])
+    #     if not self.coda_is_empty():
+    #         phonemes.append([self.get_coda().get_phoneme_string()])
+    #     return phonemes
+
+    # def get_phoneme_string(self) -> str:
+    #     """Returns a string representation of the phoneme clusters in the syllable"""
+    #     return (
+    #         self.onset.get_phoneme_string()
+    #         + self.rime.get_nucleus().get_phoneme_string()
+    #         + self.rime.get_coda().get_phoneme_string()
+    #     )
+
     # Boolean Methods
     def is_light(self) -> bool:
         return self.is_short() and self.coda_is_empty()
@@ -225,6 +227,7 @@ class Syllable:
             + str(self.get_coda())
             + "}"
         )
+
     def __repr__(self):
         return (
             "Syllable(onset="
@@ -254,6 +257,26 @@ class Word:
 
     def __repr__(self) -> str:
         return "Word(syllables=[" + ", ".join(repr(s) for s in self.syllables) + "])"
+
+
+class Sentence:
+    """Represents a sentence, which is a collection of words"""
+
+    def __init__(self, words: Optional[List[Word]] = None) -> None:
+        self.words: List[Word] = words if words else []
+
+    def add_word(self, word: Word) -> None:
+        self.words.append(word)
+
+    def get_words(self) -> List[Word]:
+        return self.words
+
+    def __str__(self) -> str:
+        return " | ".join(str(w) for w in self.words)
+
+    def __repr__(self) -> str:
+        return "Sentence(words=[" + ", ".join(repr(w) for w in self.words) + "])"
+
 
 class Rime:
     """Rime Class"""
@@ -296,38 +319,3 @@ class Rime:
 
     def get_stress(self) -> str:
         return self.nucleus.get_stress() if hasattr(self.nucleus, "get_stress") else "0"
-
-
-
-class Vowel:
-    """Represents an individual phoneme that has been classified as a vowel"""
-
-    def __init__(self, **features: Any) -> None:
-        # phoneme string
-        self.phoneme: str = features["Vowel"]
-        # retrieves appropriate entry from vowel types dictionary
-        # for this particular phoneme
-        self.vowel_features: Dict[str, str] = VOWEL_TYPES[self.phoneme]
-        # stress string
-        self.stress: str = features.get("Stress", "0") or "0"
-        # length of vowel (short, or long)
-        self.length: str = self.vowel_features["length"]
-
-    def __str__(self) -> str:
-        return "%s [st:%s ln:%s]" % (self.phoneme, self.stress, self.length)
-
-    def __repr__(self) -> str:
-        return f"Vowel(phoneme={self.phoneme}, stress={self.stress}, length={self.length})"
-
-
-class Consonant:
-    """Represents an individual phoneme that has been classified as a consonant"""
-
-    def __init__(self, **features: Any) -> None:
-        self.phoneme: str = features["Consonant"]
-
-    def __str__(self) -> str:
-        return "%s " % self.phoneme
-
-    def __repr__(self) -> str:
-        return f"Consonant(phoneme={self.phoneme})"

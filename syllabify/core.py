@@ -5,13 +5,14 @@ Updated to Python 3 from Python 2 original
 
 import re
 import copy
-import sys
-import random
 import functools
-from .cmu_parser import CMUtranscribe
-from .syllable_types import Cluster, Consonant, Vowel, Empty, Rime, Syllable, Word
-from .phoneme_types import *
 from typing import List
+
+from syllabify.cmu_parser import CMUtranscribe
+from syllabify.syllables import Cluster, Syllable, Word, Sentence
+from syllabify.phonemes import Vowel, Consonant
+from syllabify.symbols import *
+
 
 phoneme_classify = re.compile(
     r"""
@@ -357,25 +358,53 @@ def onset_rules(cluster):
     return (coda_cluster, cluster)
 
 
-def generate(word):
-    """Generate syllables from a word using the CMU Pronouncing Dictionary"""
-    phoneme_list = CMUtranscribe(word.strip())
-    if phoneme_list:
-        return factory(phoneme_list[0])  # first version only
+def syllabify(input_data) -> Word | Sentence | List[Sentence]:
+    """
+    Enhanced syllabify function that supports:
+    - Single word (str) -> Word object
+    - Single sentence (str) -> Sentence object  
+    - List of sentences (List[str]) -> List[Sentence] objects
+    """
+    
+    if isinstance(input_data, str):
+        # Check if input contains multiple words
+        words = input_data.strip().split()
+        
+        if len(words) == 1:
+            # Single word processing
+            phoneme_list = CMUtranscribe(words[0])
+            if phoneme_list:
+                syllables = factory(phoneme_list[0])  # first version only
+                return Word(syllables) if syllables else None
+            else:
+                print(words[0] + " not in CMU dictionary, sorry, please try again...")
+                return None
+        else:
+            # Multiple words processing (sentence)
+            word_objects = []
+            for word in words:
+                phoneme_list = CMUtranscribe(word.rstrip())
+                if phoneme_list:
+                    syllables = factory(phoneme_list[0])
+                    if syllables:
+                        word_objects.append(Word(syllables))
+            return Sentence(word_objects) if word_objects else None
+    
+    elif isinstance(input_data, list):
+        # List of sentences processing
+        sentence_objects = []
+        for sentence_str in input_data:
+            if isinstance(sentence_str, str):
+                sentence_result = syllabify(sentence_str)
+                if isinstance(sentence_result, Sentence):
+                    sentence_objects.append(sentence_result)
+                elif isinstance(sentence_result, Word):
+                    # Single word treated as sentence with one word
+                    sentence_objects.append(Sentence([sentence_result]))
+        return sentence_objects
+    
     else:
-        print(word + " not in CMU dictionary, sorry, please try again...")
-        return None
-
-# generate syllables from a sentence
-def generate_sentence(sentence: str) -> List[Word]:
-    """Generate syllables from a sentence using the CMU Pronouncing Dictionary"""
-    words = sentence.split()
-    word_objects = []
-    for word in words:
-        syllables = generate(word.rstrip())
-        if syllables:
-            word_objects.append(Word(syllables))
-    return word_objects
+        raise TypeError("Input must be a string or list of strings")
 
 def get_raw(word):
     """Get raw phoneme transcription"""

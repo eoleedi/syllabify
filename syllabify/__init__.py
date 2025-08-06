@@ -13,22 +13,24 @@ except PackageNotFoundError:
 
 # These imports might fail if the files aren't ready yet, so we'll handle gracefully
 try:
-    from .syllable import generate, generate_sentence, get_raw
-    from .cmu_parser import CMUtranscribe
-    from .syllable_types import (
-        Cluster,
-        Consonant,
+    from syllabify.core import syllabify
+    from syllabify.cmu_parser import CMUtranscribe
+    from syllabify.symbols import (
         Vowel,
+        Consonant,
+    )
+    from syllabify.syllables import (
+        Cluster,
         Empty,
         Rime,
         Syllable,
+        Word,
+        Sentence,
         VOWEL_TYPES,
     )
 
     __all__ = [
-        "generate",
-        "generate_sentence",
-        "get_raw",
+        "syllabify",
         "CMUtranscribe",
         "Cluster",
         "Consonant",
@@ -36,6 +38,8 @@ try:
         "Empty",
         "Rime",
         "Syllable",
+        "Word",
+        "Sentence",
         "VOWEL_TYPES",
     ]
 except ImportError:

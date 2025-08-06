@@ -25,9 +25,9 @@ pip install syllabify
 ### Package interface
 
 ```python
-from syllabify import generate
+from syllabify import syllabify
 
-syllable = generate("linguistics")
+syllable = syllabify("linguistics")
 print(syllable)
 
 # Output:
@@ -40,9 +40,9 @@ print(syllable)
 You can get the onset, nucleus, and coda of each syllable:
 
 ```python
-from syllabify import generate
+from syllabify import syllabify
 
-syllable = generate("linguistics")
+syllable = syllabify("linguistics")
 print(f"Onset: {syllable.get_onset()}")
 print(f"Nucleus: {syllable.get_nucleus()}")
 print(f"Coda: {syllable.get_coda()}")
@@ -55,13 +55,13 @@ print(f"Coda: {syllable.get_coda()}")
 One word at a time:
 
 ```bash
-python3 syllable3.py linguistics
+syllabify linguistics
 ```
 
 Or several (space-separated):
 
 ```bash
-python3 syllable3.py colourless green ideas
+syllabify colourless green ideas
 ```
 
 ## Output

@@ -3,14 +3,14 @@ Command Line Interface for syllabify
 """
 
 import sys
-from .syllable import generate_sentence
+from syllabify.core import syllabify
 
 
 def main():
     """Main function for command line usage"""
     if len(sys.argv) > 1:
         words = sys.argv[1:]
-        syllables = generate_sentence(" ".join(words))
+        syllables = syllabify(" ".join(words))
         for syllable in syllables:
             print(syllable)  # print syllables
     else:

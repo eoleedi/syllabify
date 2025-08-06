@@ -9,6 +9,8 @@ import re
 import random
 import functools
 
+from syllabify.phonemes import Phoneme
+
 # Settings
 CMU_DIR = os.path.join(os.path.dirname(__file__), "CMU_dictionary")
 # Version
@@ -99,16 +101,6 @@ class Transcription:
     def get_phonemic_representations(self):
         # return all the phonemes that can represent this word
         return [x.phoneme for x in self.representation]
-
-
-class Phoneme:
-    """Individual phoneme representation"""
-
-    def __init__(self, phoneme):
-        self.phoneme = phoneme
-
-    def __str__(self):
-        return str(self.phoneme)
 
 
 # create dictionary
