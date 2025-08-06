@@ -11,8 +11,7 @@ def main():
     if len(sys.argv) > 1:
         words = sys.argv[1:]
         syllables = syllabify(" ".join(words))
-        for syllable in syllables:
-            print(syllable)  # print syllables
+        print(syllables)  # print syllables
     else:
         print(
             "Please input a word, or list of words (space-separated) as argument variables"
