@@ -81,6 +81,10 @@ class Cluster:
         """Check if this cluster contains any phonemes."""
         return bool(self.phonemes)
 
+    def get_phoneme(self) -> List[Union[Vowel, Consonant]]:
+        """Returns a list of phonemes in this cluster."""
+        return self.phonemes.copy()
+
     def __eq__(self, other: object) -> bool:
         """compare cluster objects"""
         if isinstance(other, Cluster):
@@ -151,25 +155,23 @@ class Syllable:
         """Get the stress level of this syllable."""
         return self.nucleus.stress if hasattr(self.nucleus, "stress") else "0"
 
-    # def get_phoneme(self) -> List[Union[Cluster, Empty]]:
-    #     """Returns a list of phoneme clusters in the syllable"""
-    #     # do not include Empty clusters
-    #     phonemes = []
-    #     if not self.onset_is_empty():
-    #         phonemes.extend([self.get_onset().get_phoneme_string()])
-    #     if not self.nucleus_is_empty():
-    #         phonemes.extend([self.get_nucleus().get_phoneme_string()])
-    #     if not self.coda_is_empty():
-    #         phonemes.append([self.get_coda().get_phoneme_string()])
-    #     return phonemes
+    def get_phoneme(self) -> List[Union[Vowel, Consonant]]:
+        """Returns a list of phonemes in the syllable"""
+        phonemes = []
 
-    # def get_phoneme_string(self) -> str:
-    #     """Returns a string representation of the phoneme clusters in the syllable"""
-    #     return (
-    #         self.onset.get_phoneme_string()
-    #         + self.rime.get_nucleus().get_phoneme_string()
-    #         + self.rime.get_coda().get_phoneme_string()
-    #     )
+        # Add phonemes from onset
+        if self.has_onset() and hasattr(self.onset, "phonemes"):
+            phonemes.extend(self.onset.phonemes)
+
+        # Add phonemes from nucleus
+        if self.has_nucleus() and hasattr(self.nucleus, "phonemes"):
+            phonemes.extend(self.nucleus.phonemes)
+
+        # Add phonemes from coda
+        if self.has_coda() and hasattr(self.coda, "phonemes"):
+            phonemes.extend(self.coda.phonemes)
+
+        return phonemes
 
     # Boolean Methods
     def is_light(self) -> bool:
@@ -249,6 +251,13 @@ class Word:
         """Add a syllable to this word."""
         self.syllables.append(syllable)
 
+    def get_phoneme(self) -> List[Union[Vowel, Consonant]]:
+        """Returns a list of all phonemes in the word"""
+        phonemes = []
+        for syllable in self.syllables:
+            phonemes.extend(syllable.get_phoneme())
+        return phonemes
+
     def __str__(self) -> str:
         return " ".join(str(s) for s in self.syllables)
 
@@ -265,6 +274,13 @@ class Sentence:
     def add_word(self, word: Word) -> None:
         """Add a word to this sentence."""
         self.words.append(word)
+
+    def get_phoneme(self) -> List[Union[Vowel, Consonant]]:
+        """Returns a list of all phonemes in the sentence"""
+        phonemes = []
+        for word in self.words:
+            phonemes.extend(word.get_phoneme())
+        return phonemes
 
     def __str__(self) -> str:
         return " | ".join(str(w) for w in self.words)

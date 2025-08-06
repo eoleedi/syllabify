@@ -42,7 +42,7 @@ class Vowel(Phoneme):
         self.length: str = self.vowel_features["length"]
 
     def __str__(self) -> str:
-        return f"{self.phoneme} [st:{self.stress} ln:{self.length}]"
+        return f"{self.phoneme}{self.stress}"
 
     def __repr__(self) -> str:
         return (
@@ -59,7 +59,7 @@ class Consonant(Phoneme):
         super().__init__(self.phoneme)
 
     def __str__(self) -> str:
-        return f"{self.phoneme} "
+        return f"{self.phoneme}"
 
     def __repr__(self) -> str:
         return f"Consonant(phoneme={self.phoneme})"
