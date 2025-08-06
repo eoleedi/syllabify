@@ -26,15 +26,14 @@ pip install syllabify
 
 ```python
 from syllabify import syllabify
+word = syllabify("linguistics")
+print(word)
+```
 
-syllable = syllabify("linguistics")
-print(syllable)
-
-# Output:
-# [Syllable(onset=L , nucleus=IH [st:0 ln:short], coda=NG ),
-#  Syllable(onset=G W , nucleus=IH [st:1 ln:short], coda=empty),
-#  Syllable(onset=S T , nucleus=IH [st:0 ln:short], coda=K S )
-# ]
+```text
+L IH0 NG {onset: L, nucleus: IH0, coda: NG}
+G W IH1 {onset: GW, nucleus: IH1, coda: empty}
+S T IH0 K S {onset: ST, nucleus: IH0, coda: KS}
 ```
 
 You can get the onset, nucleus, and coda of each syllable:
@@ -42,13 +41,24 @@ You can get the onset, nucleus, and coda of each syllable:
 ```python
 from syllabify import syllabify
 
-syllable = syllabify("linguistics")
-print(f"Onset: {syllable.get_onset()}")
-print(f"Nucleus: {syllable.get_nucleus()}")
-print(f"Coda: {syllable.get_coda()}")
-
+word = syllabify("linguistics")
+for syllable in word.syllables:
+    print(f"Onset: {syllable.onset}")
+    print(f"Nucleus: {syllable.nucleus}")
+    print(f"Coda: {syllable.coda}")
 ```
 
+```text
+Onset: L
+Nucleus: IH0
+Coda: NG
+Onset: GW
+Nucleus: IH1
+Coda: empty
+Onset: ST
+Nucleus: IH0
+Coda: KS
+```
 
 ### Command line interface
 
@@ -58,23 +68,41 @@ One word at a time:
 syllabify linguistics
 ```
 
+```text
+📝 Input: linguistics
+🔤 Syllabification:
+
+LIH0NG [L.IH0.NG] | ˈGWIH1 [GW.IH1.∅] | STIH0KS [ST.IH0.KS]
+
+📖 Legend:
+  [onset.nucleus.coda] = syllable structure
+  ∅ = empty position
+  ˈ = primary stress
+  ˌ = secondary stress
+  | = syllable boundary
+```
+
 Or several (space-separated):
 
 ```bash
-syllabify colourless green ideas
+syllabify colorless green ideas
 ```
 
-## Output
+```text
+📝 Input: colorless green ideas
+🔤 Syllabification:
 
-If the input word is found in the dictionary, a phonemic, syllabified transcript is returned. For example, for the word _linguistics_:
+  ˈKAH1 [K.AH1.∅] | LER0 [L.ER0.∅] | LAH0S [L.AH0.S]
+  ˈGRIY1N [GR.IY1.N]
+  AY0 [∅.AY0.∅] | ˈDIY1 [D.IY1.∅] | AH0Z [∅.AH0.Z]
 
+📖 Legend:
+  [onset.nucleus.coda] = syllable structure
+  ∅ = empty position
+  ˈ = primary stress
+  ˌ = secondary stress
+  | = syllable boundary
 ```
-{onset: L , nucleus: IH [st:0 ln:short], coda: NG }
-{onset: G W , nucleus: IH [st:1 ln:short], coda: empty}
-{onset: S T , nucleus: IH [st:0 ln:short], coda: K S }
-```
-
-There's one syllable per line. Each syllable is made up of an 'onset', 'nucleus', and 'coda'. Phonemes are space-separated and capitalized in [ARPAbet](http://en.wikipedia.org/wiki/ARPABET) format. In line with phonological theory, the nucleus must have content, whereas the onset and coda may be empty. Within the vocalic content of the nucleus there's also an indication whether the syllable is stressed ('st':0 or 1), and whether the length ('ln') is short or long.
 
 ## CMU Pronouncing Dictionary
 
