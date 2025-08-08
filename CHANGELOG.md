@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/eoleedi/syllabify/compare/v0.3.0...v0.3.1) (2025-08-08)
+
+
+### Bug Fixes
+
+* incorrect import in __init__.py ([b3bde12](https://github.com/eoleedi/syllabify/commit/b3bde12b7caf058943dc4fab3588634133878fec))
+
 ## [0.3.0](https://github.com/eoleedi/syllabify/compare/v0.2.0...v0.3.0) (2025-08-06)
 
 
