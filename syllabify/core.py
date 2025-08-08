@@ -388,28 +388,22 @@ def onset_rules(cluster):  # pylint: disable=too-many-branches
     return (coda_cluster, cluster)
 
 
-def syllabify(input_data) -> Word | Sentence | List[Sentence]:
+def syllabify(input_data) -> Sentence | List[Sentence]:
     """
     Enhanced syllabify function that supports:
-    - Single word (str) -> Word object
+    - Single word (str) -> Sentence object containing one Word
     - Single sentence (str) -> Sentence object
     - List of sentences (List[str]) -> List[Sentence] objects
+
+    This provides a consistent return type where words are always contained within Sentence objects.
     """
 
     if isinstance(input_data, str):
         # Check if input contains multiple words
         words = input_data.strip().split()
-
-        if len(words) == 1:
-            # Single word processing
-            phonemes = cmu_transcribe(words[0])
-            if phonemes:
-                syllables = factory(phonemes[0])  # first version only
-                return Word(syllables) if syllables else None
-            raise ValueError(f"Word '{words[0]}' not found in CMU dictionary")
-
-        # Multiple words processing (sentence)
         word_objects = []
+
+        # Process all words (whether single or multiple)
         for word in words:
             phonemes = cmu_transcribe(word.rstrip())
             if phonemes:
@@ -418,6 +412,7 @@ def syllabify(input_data) -> Word | Sentence | List[Sentence]:
                     word_objects.append(Word(syllables))
             else:
                 raise ValueError(f"Word '{word.rstrip()}' not found in CMU dictionary")
+
         return Sentence(word_objects) if word_objects else None
 
     if isinstance(input_data, list):
