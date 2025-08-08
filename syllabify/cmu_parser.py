@@ -6,7 +6,6 @@ changes other than print() statements noted
 
 import os
 import re
-import random
 import functools
 
 from syllabify.phonemes import Phoneme
@@ -123,37 +122,3 @@ def cmu_transcribe(word):
     except AttributeError:
         # Entry not found
         return None
-
-
-def test_word(word):
-    """Test function for a single word"""
-    return cmu_transcribe(word)
-
-
-def test():
-    """Test Function - prints the transcription of 100 words"""
-    try:
-        with open(
-            "./CMU_dictionary/american-english", "r", encoding="utf-8"
-        ) as words_file:
-            words = words_file.readlines()
-    except FileNotFoundError:
-        print("american-english file not found, using sample words")
-        words = ["hello\n", "world\n", "python\n", "linguistics\n"]
-
-    for _ in range(min(100, len(words))):
-        word = random.choice(words)[:-1]
-        syllable = cmu_transcribe(word)
-        if syllable:
-            transcriptions = 0
-            output = word
-            for ph in syllable:
-                transcriptions += 1
-                output += "\n"
-                output += str(transcriptions) + (": " + ph)
-            output += "\n"
-            print(output)
-
-
-if __name__ == "__main__":
-    test()
