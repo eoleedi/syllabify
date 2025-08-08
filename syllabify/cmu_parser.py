@@ -14,7 +14,7 @@ from syllabify.phonemes import Phoneme
 # Settings
 CMU_DIR = os.path.join(os.path.dirname(__file__), "CMU_dictionary")
 # Version
-VERSION = "cmudict.0.7a"
+VERSION = "cmudict-0.7b"
 # Path
 PATH_TO_DICTIONARY = os.path.join(CMU_DIR, VERSION)
 

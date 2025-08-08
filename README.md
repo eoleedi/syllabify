@@ -103,7 +103,3 @@ syllabify colorless green ideas
   ˌ = secondary stress
   | = syllable boundary
 ```
-
-## CMU Pronouncing Dictionary
-
-`Syllabify` depends on the [CMU Pronouncing Dictionary](http://www.speech.cs.cmu.edu/cgi-bin/cmudict) of North American English word pronunciations. Version 0.7b was the current one at time of writing, but it throws a UnicodeDecodeError, so we're still using version 0.7a (amended to remove erroneous 'G' from SUGGEST and related words). Please see the dictionary download website to obtain the current version, add the `cmudict-N.nx(.phones|.symbols)*` files to the `CMU_dictionary` directory, remove the '.txt' suffixes, and update the line `VERSION = 'cmudict-n.nx'` in `cmu_parser.py`
