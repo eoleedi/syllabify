@@ -388,7 +388,56 @@ def onset_rules(cluster):  # pylint: disable=too-many-branches
     return (coda_cluster, cluster)
 
 
-def syllabify(input_data) -> Sentence | List[Sentence]:
+def handle_possessive(word):
+    """
+    Handle possessive forms ending with 's (e.g., timmy's, jamie's)
+    Returns phonemes if the base word is found in the dictionary, None otherwise
+    """
+    if not word.lower().endswith("'s"):
+        return None
+
+    # Extract the base word by removing 's
+    base_word = word[:-2]
+
+    # Try to find the base word in the dictionary
+    base_phonemes = cmu_transcribe(base_word)
+    if not base_phonemes:
+        return None
+
+    # Get the base phoneme string
+    base_phoneme_str = base_phonemes[0]
+
+    # Determine the pronunciation of 's based on the last phoneme of the base word
+    last_phoneme = base_phoneme_str.strip().split()[-1]
+
+    # Remove stress markers for comparison
+    clean_last_phoneme = "".join(c for c in last_phoneme if not c.isdigit())
+
+    # Rules for 's pronunciation:
+    # /S/ after voiceless consonants (except s, sh, ch, x sounds)
+    # /Z/ after voiced consonants and vowels
+    # /IH Z/ after sibilants (s, z, sh, zh, ch, jh)
+
+    sibilants = ["S", "Z", "SH", "ZH", "CH", "JH"]
+    voiceless_consonants = ["P", "T", "K", "F", "TH"]  # TH voiceless
+
+    if clean_last_phoneme in sibilants:
+        possessive_suffix = " IH0 Z"
+    elif clean_last_phoneme in voiceless_consonants:
+        possessive_suffix = " S"
+    else:
+        # Default to /Z/ for voiced consonants and vowels
+        possessive_suffix = " Z"
+
+    # Combine base phonemes with possessive suffix
+    return [base_phoneme_str + possessive_suffix]
+
+
+def syllabify(
+    input_data,
+) -> (
+    Sentence | List[Sentence]
+):  # pylint: disable=too-many-branches,too-many-return-statements
     """
     Enhanced syllabify function that supports:
     - Single word (str) -> Sentence object containing one Word
@@ -411,7 +460,16 @@ def syllabify(input_data) -> Sentence | List[Sentence]:
                 if syllables:
                     word_objects.append(Word(syllables))
             else:
-                raise ValueError(f"Word '{word.rstrip()}' not found in CMU dictionary")
+                # Try to handle possessive forms
+                possessive_phonemes = handle_possessive(word.rstrip())
+                if possessive_phonemes:
+                    syllables = factory(possessive_phonemes[0])
+                    if syllables:
+                        word_objects.append(Word(syllables))
+                else:
+                    raise ValueError(
+                        f"Word '{word.rstrip()}' not found in CMU dictionary"
+                    )
 
         return Sentence(word_objects) if word_objects else None
 
