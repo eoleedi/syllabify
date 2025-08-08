@@ -265,6 +265,18 @@ class Word:
     def __repr__(self) -> str:
         return "Word(syllables=[" + ", ".join(repr(s) for s in self.syllables) + "])"
 
+    def __iter__(self):
+        """Iterate over syllables in the word."""
+        return iter(self.syllables)
+
+    def __getitem__(self, index):
+        """Get a syllable by index or slice."""
+        return self.syllables[index]
+
+    def __len__(self):
+        """Get the number of syllables in the word."""
+        return len(self.syllables)
+
 
 class Sentence:
     """Represents a sentence, which is a collection of words"""
@@ -288,6 +300,18 @@ class Sentence:
 
     def __repr__(self) -> str:
         return "Sentence(words=[" + ", ".join(repr(w) for w in self.words) + "])"
+
+    def __iter__(self):
+        """Iterate over words in the sentence."""
+        return iter(self.words)
+
+    def __getitem__(self, index):
+        """Get a word by index or slice."""
+        return self.words[index]
+
+    def __len__(self):
+        """Get the number of words in the sentence."""
+        return len(self.words)
 
 
 class Rime:  # pylint: disable=too-few-public-methods
