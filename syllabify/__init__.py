@@ -16,7 +16,7 @@ except PackageNotFoundError:
 try:
     from syllabify.core import syllabify
     from syllabify.cmu_parser import cmu_transcribe
-    from syllabify.symbols import (
+    from syllabify.phonemes import (
         Vowel,
         Consonant,
     )
@@ -27,8 +27,8 @@ try:
         Syllable,
         Word,
         Sentence,
-        VOWEL_TYPES,
     )
+    from syllabify.constants import VOWEL_TYPES
 
     __all__ = [
         "syllabify",
