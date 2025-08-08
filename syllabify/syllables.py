@@ -92,7 +92,7 @@ class Cluster:
         return bool(self.phonemes)
 
     def __str__(self) -> str:
-        return functools.reduce(lambda x, y: str(x) + str(y), self.phonemes, "")
+        return " ".join(str(p) for p in self.phonemes)
 
     def __repr__(self) -> str:
         return "Cluster(" + str(self.get_phoneme_string()) + ")"
