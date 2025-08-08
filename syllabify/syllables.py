@@ -35,7 +35,8 @@ class Cluster:
         """Update the comparator string after adding phonemes."""
         self.comparator = self.get_phoneme_string()
 
-    def get_stress(self) -> str:
+    @property
+    def stress(self) -> str:
         """Get the stress level of this cluster (only applicable for vowel clusters)."""
         if self.type() == Vowel:
             # mapping function that returns the stress value of a Vowel
@@ -49,11 +50,6 @@ class Cluster:
                 "0",
             )
         return "0"
-
-    @property
-    def stress(self) -> str:
-        """Property for stress level."""
-        return self.get_stress()
 
     def type(self) -> Optional[type]:
         """returns the type of the phoneme cluster: either Vowel, or Consonant"""
@@ -324,4 +320,4 @@ class Rime:  # pylint: disable=too-few-public-methods
     @property
     def stress(self) -> str:
         """Get the stress level of this rime's nucleus."""
-        return self.nucleus.get_stress() if hasattr(self.nucleus, "get_stress") else "0"
+        return self.nucleus.stress if hasattr(self.nucleus, "stress") else "0"
