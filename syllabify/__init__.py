@@ -14,8 +14,7 @@ except PackageNotFoundError:
 
 # These imports might fail if the files aren't ready yet, so we'll handle gracefully
 try:
-    from syllabify.core import syllabify
-    from syllabify.cmu_parser import cmu_transcribe
+    from syllabify.core import syllabify, transcribe
     from syllabify.phonemes import (
         Vowel,
         Consonant,
@@ -32,7 +31,7 @@ try:
 
     __all__ = [
         "syllabify",
-        "cmu_transcribe",
+        "transcribe",
         "Cluster",
         "Consonant",
         "Vowel",

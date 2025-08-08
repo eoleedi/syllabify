@@ -435,6 +435,7 @@ def handle_possessive(word):
 
 def syllabify(
     input_data,
+    fallback_fn=None,
 ) -> (
     Sentence | List[Sentence]
 ):  # pylint: disable=too-many-branches,too-many-return-statements
@@ -443,6 +444,15 @@ def syllabify(
     - Single word (str) -> Sentence object containing one Word
     - Single sentence (str) -> Sentence object
     - List of sentences (List[str]) -> List[Sentence] objects
+
+    Args:
+        input_data: String or list of strings to syllabify
+        fallback_fn: Optional callable that takes a word (str) and returns phonemes (str)
+                    when the word is not found in CMU dictionary. Should return None if
+                    the word cannot be processed.
+
+    Returns:
+        Sentence object or list of Sentence objects
 
     This provides a consistent return type where words are always contained within Sentence objects.
     """
@@ -454,22 +464,14 @@ def syllabify(
 
         # Process all words (whether single or multiple)
         for word in words:
-            phonemes = cmu_transcribe(word.rstrip())
+            phonemes = transcribe(word, fallback_fn=fallback_fn)
             if phonemes:
                 syllables = factory(phonemes[0])
                 if syllables:
                     word_objects.append(Word(syllables))
             else:
-                # Try to handle possessive forms
-                possessive_phonemes = handle_possessive(word.rstrip())
-                if possessive_phonemes:
-                    syllables = factory(possessive_phonemes[0])
-                    if syllables:
-                        word_objects.append(Word(syllables))
-                else:
-                    raise ValueError(
-                        f"Word '{word.rstrip()}' not found in CMU dictionary"
-                    )
+                # If no fallback or fallback failed, raise error
+                raise ValueError(f"Word '{word.rstrip()}' not found in CMU dictionary")
 
         return Sentence(word_objects) if word_objects else None
 
@@ -478,7 +480,7 @@ def syllabify(
         sentence_objects = []
         for sentence_str in input_data:
             if isinstance(sentence_str, str):
-                sentence_result = syllabify(sentence_str)
+                sentence_result = syllabify(sentence_str, fallback_fn)
                 if isinstance(sentence_result, Sentence):
                     sentence_objects.append(sentence_result)
                 elif isinstance(sentence_result, Word):
@@ -487,6 +489,29 @@ def syllabify(
         return sentence_objects
 
     raise TypeError("Input must be a string or list of strings")
+
+
+def transcribe(word, fallback_fn=None):
+    """Transcribe a word into its phoneme representation.
+    Including handling of possessive forms, and use fallback function if provided.
+    """
+    word = word.strip()
+
+    # Use cmu dictionary if found
+    phonemes = cmu_transcribe(word)
+    if phonemes:
+        return phonemes[0]
+
+    # handle possessive
+    phonemes = handle_possessive(word)
+    if phonemes:
+        return phonemes
+
+    # Fallback function
+    if fallback_fn and callable(fallback_fn):
+        return fallback_fn(word)
+
+    return None
 
 
 def get_raw(word):
