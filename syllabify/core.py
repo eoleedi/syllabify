@@ -406,8 +406,7 @@ def syllabify(input_data) -> Word | Sentence | List[Sentence]:
             if phonemes:
                 syllables = factory(phonemes[0])  # first version only
                 return Word(syllables) if syllables else None
-            print(words[0] + " not in CMU dictionary, sorry, please try again...")
-            return None
+            raise ValueError(f"Word '{words[0]}' not found in CMU dictionary")
 
         # Multiple words processing (sentence)
         word_objects = []
@@ -417,6 +416,8 @@ def syllabify(input_data) -> Word | Sentence | List[Sentence]:
                 syllables = factory(phonemes[0])
                 if syllables:
                     word_objects.append(Word(syllables))
+            else:
+                raise ValueError(f"Word '{word.rstrip()}' not found in CMU dictionary")
         return Sentence(word_objects) if word_objects else None
 
     if isinstance(input_data, list):
