@@ -97,6 +97,12 @@ class Cluster:
     def __repr__(self) -> str:
         return "Cluster(" + str(self.get_phoneme_string()) + ")"
 
+    def __iter__(self):
+        return iter(self.phonemes)
+
+    def __getitem__(self, index):
+        return self.phonemes[index]
+
 
 class Empty:
     """container for the empty syllable cluster"""
@@ -128,6 +134,9 @@ class Empty:
     def __repr__(self) -> str:
         return "Empty()"
 
+    def __iter__(self):
+        return iter([self])
+
 
 class Syllable:
     """groups phonemes into syllables"""
@@ -147,7 +156,8 @@ class Syllable:
         """Get the stress level of this syllable."""
         return self.nucleus.stress if hasattr(self.nucleus, "stress") else "0"
 
-    def get_phoneme(self) -> List[Union[Vowel, Consonant]]:
+    @property
+    def phonemes(self) -> List[Union[Vowel, Consonant]]:
         """Returns a list of phonemes in the syllable"""
         phonemes = []
 
@@ -212,24 +222,24 @@ class Syllable:
 
     def __str__(self) -> str:
         return (
-            " ".join(map(str, self.get_phoneme())) + " "
+            " ".join(map(str, self.phonemes)) + " "
             "{onset: "
-            + str(self.onset)
+            + " ".join(map(str, self.onset))
             + ", nucleus: "
-            + str(self.nucleus)
+            + " ".join(map(str, self.nucleus))
             + ", coda: "
-            + str(self.coda)
+            + " ".join(map(str, self.coda))
             + "}"
         )
 
     def __repr__(self):
         return (
             "Syllable(onset="
-            + str(self.onset)
+            + " ".join(map(str, self.onset))
             + ", nucleus="
-            + str(self.nucleus)
+            + " ".join(map(str, self.nucleus))
             + ", coda="
-            + str(self.coda)
+            + " ".join(map(str, self.coda))
             + ")"
         )
 
