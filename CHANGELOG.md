@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.4.0](https://github.com/eoleedi/syllabify/compare/v0.3.2...v0.4.0) (2025-08-08)
+
+
+### Features
+
+* handle possessive ([e3be56b](https://github.com/eoleedi/syllabify/commit/e3be56b33d34ce2a918eb6663bb8c5b4eac4bdce))
+* support custom fallback_fn for transcribe ([c25e4aa](https://github.com/eoleedi/syllabify/commit/c25e4aa3606e8d3915e1783bf243c77b0df4aa6d))
+
+
+### Bug Fixes
+
+* add Phoneme to the package top level ([04a38c2](https://github.com/eoleedi/syllabify/commit/04a38c2873fbb43f0a1bdba0cab966eff9da13df))
+
 ## [0.3.2](https://github.com/eoleedi/syllabify/compare/v0.3.1...v0.3.2) (2025-08-08)
 
 
