@@ -26,10 +26,6 @@ class Cluster:
             string += ph.phoneme
         return string
 
-    def add_phenome(self, phoneme: Union[Vowel, Consonant]) -> None:
-        """Legacy method name - use add_phoneme instead"""
-        self.add_phoneme(phoneme)
-
     def add_phoneme(self, phoneme: Union[Vowel, Consonant]) -> None:
         """Add a phoneme to this cluster."""
         self.phonemes.append(phoneme)
