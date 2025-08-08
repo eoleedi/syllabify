@@ -16,6 +16,7 @@ except PackageNotFoundError:
 try:
     from syllabify.core import syllabify, transcribe
     from syllabify.phonemes import (
+        Phoneme,
         Vowel,
         Consonant,
     )
@@ -33,6 +34,7 @@ try:
         "syllabify",
         "transcribe",
         "Cluster",
+        "Phoneme",
         "Consonant",
         "Vowel",
         "Empty",
