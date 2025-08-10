@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/eoleedi/syllabify/compare/v0.4.0...v0.4.1) (2025-08-10)
+
+
+### Bug Fixes
+
+* incorrect transcribe output type ([779eecf](https://github.com/eoleedi/syllabify/commit/779eecf611fec2a058efdb1876fd08eeb5bb85b6))
+
 ## [0.4.0](https://github.com/eoleedi/syllabify/compare/v0.3.2...v0.4.0) (2025-08-08)
 
 
