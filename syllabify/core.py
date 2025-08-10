@@ -466,7 +466,7 @@ def syllabify(
         for word in words:
             phonemes = transcribe(word, fallback_fn=fallback_fn)
             if phonemes:
-                syllables = factory(phonemes[0])
+                syllables = factory(phonemes)
                 if syllables:
                     word_objects.append(Word(syllables))
             else:
@@ -491,9 +491,17 @@ def syllabify(
     raise TypeError("Input must be a string or list of strings")
 
 
-def transcribe(word, fallback_fn=None):
+def transcribe(word, fallback_fn=None) -> str | None:
     """Transcribe a word into its phoneme representation.
     Including handling of possessive forms, and use fallback function if provided.
+    Note: This always returns the first phoneme representation.
+
+    Args:
+        word: The word to transcribe (str).
+        fallback_fn: Optional callable that takes a word (str)
+                    and returns phonemes (str, separated by spaces)
+                    when the word is not found in CMU dictionary. Should return None if
+                    the word cannot be processed.
     """
     word = word.strip()
 
@@ -509,7 +517,9 @@ def transcribe(word, fallback_fn=None):
 
     # Fallback function
     if fallback_fn and callable(fallback_fn):
-        return fallback_fn(word)
+        phonemes = fallback_fn(word)
+        if phonemes and isinstance(phonemes, str):
+            return phonemes.strip()
 
     return None
 
