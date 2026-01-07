@@ -11,6 +11,7 @@ Modified from [the repository](https://github.com/cainesap/syllabify) set up by 
 - Environment management using Poetry
 - Python 3.10+ compatibility
 - Easy to access class and function interfaces
+- Use up-to-date cmudict versioned by [python-cmudict](https://github.com/prosegrinder/python-cmudict)
 
 ## Set up
 
