@@ -3,26 +3,31 @@ name = "syllabify"
 version = "0.4.1"
 description = "Automatically convert plain text into phonemes (US English pronunciation) and syllabify"
 authors = [
-    { name = "Fong-Chun Tsai", email = "eoleedimin@gmail.com" },
-    { name = "Andrew Caines", email = "cainesap@gmail.com" },
-    { name = "Anthony Evans" }
+  { name = "Fong-Chun Tsai", email = "eoleedimin@gmail.com" },
+  { name = "Andrew Caines", email = "cainesap@gmail.com" },
+  { name = "Anthony Evans" },
 ]
 license = "MIT"
 readme = "README.md"
-keywords = ["phonetics", "syllabification", "linguistics", "cmu", "pronunciation"]
-classifiers = [
-    "Development Status :: 3 - Alpha",
-    "Intended Audience :: Science/Research",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
-    "Topic :: Text Processing :: Linguistic",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
+keywords = [
+  "phonetics",
+  "syllabification",
+  "linguistics",
+  "cmu",
+  "pronunciation",
 ]
-requires-python = ">=3.9"
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Text Processing :: Linguistic",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+requires-python = ">=3.10"
 dynamic = ["dependencies"]
 
 [project.urls]
@@ -30,7 +35,7 @@ Homepage = "https://github.com/eoleedi/syllabify"
 Repository = "https://github.com/eoleedi/syllabify"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 
 [tool.poetry]
 packages = [{ include = "syllabify" }]
@@ -41,6 +46,7 @@ pre-commit = "^4.2.0"
 black = "^25.0"
 flake8 = "^7.0"
 mypy = "^1.0"
+pylint = "^4.0.4"
 
 [tool.poetry.scripts]
 syllabify = "syllabify.cli:main"
