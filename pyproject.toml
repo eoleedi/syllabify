@@ -42,7 +42,7 @@ cmudict = "^1.1.3"
 packages = [{ include = "syllabify" }]
 
 [tool.poetry.group.dev.dependencies]
-pre-commit = "^4.2.0"
+pre-commit = "^4.5.1"
 black = "^25.0"
 flake8 = "^7.0"
 mypy = "^1.19"
