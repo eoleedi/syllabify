@@ -36,10 +36,10 @@ Repository = "https://github.com/eoleedi/syllabify"
 
 [tool.poetry.dependencies]
 python = "^3.10"
+cmudict = "^1.1.3"
 
 [tool.poetry]
 packages = [{ include = "syllabify" }]
-include = ["syllabify/CMU_dictionary/*"]
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^4.2.0"
