@@ -1,6 +1,6 @@
 [project]
 name = "syllabify"
-version = "0.4.1"
+version = "0.5.0"
 description = "Automatically convert plain text into phonemes (US English pronunciation) and syllabify"
 authors = [
   { name = "Fong-Chun Tsai", email = "eoleedimin@gmail.com" },
