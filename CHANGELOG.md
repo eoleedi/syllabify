@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.5.0](https://github.com/eoleedi/syllabify/compare/v0.4.1...v0.5.0) (2026-01-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* add pylint to dev group and drop support for python 3.9 ([#15](https://github.com/eoleedi/syllabify/issues/15))
+
+### Features
+
+* migrate from hardcoded cmudict 0.7b to versionized python-cmudict ([#17](https://github.com/eoleedi/syllabify/issues/17)) ([d6bdd50](https://github.com/eoleedi/syllabify/commit/d6bdd507ab0c35dffa8616662c6df9a66f3e5d30))
+
+
+### Bug Fixes
+
+* add pylint to dev group and drop support for python 3.9 ([#15](https://github.com/eoleedi/syllabify/issues/15)) ([724a4b6](https://github.com/eoleedi/syllabify/commit/724a4b63f5d1877067ff7c20fd0d057eab1d181f))
+
+
+### Documentation
+
+* add classifiers for python3.13 and 3.14 ([e61de26](https://github.com/eoleedi/syllabify/commit/e61de266d636e5afeacd436578ac29694b315756))
+
 ## [0.4.1](https://github.com/eoleedi/syllabify/compare/v0.4.0...v0.4.1) (2025-08-10)
 
 
