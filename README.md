@@ -2,7 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/syllabify.svg)](https://pypi.org/project/syllabify/)
 [![Python 3.x](https://img.shields.io/pypi/pyversions/syllabify.svg?logo=python&logoColor=white)](https://pypi.org/project/syllabify/)
-[![License](https://img.shields.io/github/license/eoleedi/TimeTree-Exporter)](https://github.com/eoleedi/TimeTree-Exporter/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/eoleedi/syllabify)](https://github.com/eoleedi/syllabify/blob/main/LICENSE)
 
 Automatically convert plain text into phonemes (US English pronunciation) and syllabify.
 
