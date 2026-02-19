@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.1](https://github.com/eoleedi/syllabify/compare/v0.5.0...v0.5.1) (2026-02-19)
+
+
+### Documentation
+
+* add credits to the original authors ([47cf0b0](https://github.com/eoleedi/syllabify/commit/47cf0b0aa917e0fe74e03de8f9de284e2bb291f4))
+* typo ([cb48175](https://github.com/eoleedi/syllabify/commit/cb48175a98ecf260ff94abaf1a76dd7cc3d51be7))
+
 ## [0.5.0](https://github.com/eoleedi/syllabify/compare/v0.4.1...v0.5.0) (2026-01-20)
 
 
