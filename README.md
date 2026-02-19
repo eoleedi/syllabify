@@ -13,6 +13,7 @@ Modified from [the repository](https://github.com/cainesap/syllabify) set up by 
 - Easy to access class and function interfaces
 - Use up-to-date cmudict versioned by [python-cmudict](https://github.com/prosegrinder/python-cmudict)
 
+> Credits: Many thanks for [@cainesap](https://github.com/cainesap)'s work on porting and fixes & the original author [@anthonysgevans]((https://github.com/anthonysgevans))
 ## Set up
 
 Requires [Python 3](https://www.python.org/downloads) (Anthony Evans used Python 2: if that's what you prefer, see his repo).
