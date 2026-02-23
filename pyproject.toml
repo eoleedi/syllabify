@@ -48,7 +48,7 @@ pre-commit = "^4.5.1"
 black = "^26.1"
 flake8 = "^7.0"
 mypy = "^1.19"
-pylint = "^4.0.4"
+pylint = "^4.0.5"
 
 [tool.poetry.scripts]
 syllabify = "syllabify.cli:main"
