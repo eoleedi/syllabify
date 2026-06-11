@@ -47,7 +47,7 @@ packages = [{ include = "syllabify" }]
 pre-commit = "^4.6.0"
 black = "^26.5.1"
 flake8 = "^7.3.0"
-mypy = "^1.20.2"
+mypy = "^2.1.0"
 pylint = "^4.0.5"
 
 [tool.poetry.scripts]
