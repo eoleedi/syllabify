@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.5.1](https://github.com/eoleedi/syllabify/compare/v0.5.0...v0.5.1) (2026-06-16)
+
+
+### Bug Fixes
+
+* **core:** avoid stranding stressed short vowels ([6eb69d9](https://github.com/eoleedi/syllabify/commit/6eb69d921c0841ec114e7d0c72aab7e17b8325ba))
+* **core:** return possessive phonemes as string ([8b67f9e](https://github.com/eoleedi/syllabify/commit/8b67f9ebe780d3313943199d34a7b0d2810c830a))
+
+
+### Documentation
+
+* add credits to the original authors ([47cf0b0](https://github.com/eoleedi/syllabify/commit/47cf0b0aa917e0fe74e03de8f9de284e2bb291f4))
+* typo ([cb48175](https://github.com/eoleedi/syllabify/commit/cb48175a98ecf260ff94abaf1a76dd7cc3d51be7))
+
 ## [0.5.0](https://github.com/eoleedi/syllabify/compare/v0.4.1...v0.5.0) (2026-01-20)
 
 
