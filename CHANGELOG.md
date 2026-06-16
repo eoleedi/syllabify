@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.2](https://github.com/eoleedi/syllabify/compare/v0.5.1...v0.5.2) (2026-06-16)
+
+
+### Documentation
+
+* update the example to match the new behavior ([057f190](https://github.com/eoleedi/syllabify/commit/057f190664ea4ec165924556f9e18c4c3caeda6b))
+
 ## [0.5.1](https://github.com/eoleedi/syllabify/compare/v0.5.0...v0.5.1) (2026-06-16)
 
 
