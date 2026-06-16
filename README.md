@@ -94,7 +94,7 @@ syllabify colorless green ideas
 📝 Input: colorless green ideas
 🔤 Syllabification:
 
-  ˈKAH1 [K.AH1.∅] | LER0 [L.ER0.∅] | LAH0S [L.AH0.S]
+  ˈKAH1L [K.AH1.L] | ER0 [∅.ER0.∅] | LAH0S [L.AH0.S]
   ˈGRIY1N [GR.IY1.N]
   AY0 [∅.AY0.∅] | ˈDIY1 [D.IY1.∅] | AH0Z [∅.AH0.Z]
 
