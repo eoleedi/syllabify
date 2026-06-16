@@ -12,6 +12,13 @@ from syllabify.cmu_parser import cmu_transcribe
 from syllabify.syllables import Cluster, Syllable, Word, Sentence
 from syllabify.phonemes import Vowel, Consonant
 from syllabify.symbols import (
+    AO,
+    EH,
+    AH,
+    AA,
+    IH,
+    UH,
+    AE,
     NG,
     HH,
     W,
@@ -37,6 +44,8 @@ from syllabify.symbols import (
     L,
     R,
 )
+
+UNREDUCED_SHORT_VOWELS = {AO, EH, AH, AA, IH, UH, AE}
 
 phoneme_classify = re.compile(
     r"""
@@ -135,10 +144,13 @@ def _create_syllable(syllable_list, cluster):
             push(new_syllable)
             return syllable_list
         if syllable.coda_is_empty():
-            # Onset Maximalism dictates we push consonant clusters to
-            # the onset of the next syllable, unless the nuclear cluster is LIGHT and
-            # has primary stress
-            maximal_coda, maximal_onset = onset_rules(cluster)
+            if _has_stressed_short_nucleus(syllable) and len(cluster.phonemes) == 1:
+                maximal_coda, maximal_onset = cluster, None
+            else:
+                # Onset Maximalism dictates we push consonant clusters to
+                # the onset of the next syllable, unless the nuclear cluster is LIGHT and
+                # has primary stress
+                maximal_coda, maximal_onset = onset_rules(cluster)
 
             # AC 2017-09-15: removed ambisyllabicity as a theoretical stance
             # add cluster only to the next syllable
@@ -154,6 +166,17 @@ def _create_syllable(syllable_list, cluster):
             push(new_syllable)
             return syllable_list
     return syllable_list  # Add explicit return for consistency
+
+
+def _has_stressed_short_nucleus(syllable):
+    """Return True when maximal onset would strand a stressed short vowel."""
+    if not syllable.has_nucleus() or not hasattr(syllable.nucleus, "phonemes"):
+        return False
+    return (
+        len(syllable.nucleus.phonemes) == 1
+        and syllable.nucleus.phonemes[0].phoneme in UNREDUCED_SHORT_VOWELS
+        and syllable.stress != "0"
+    )
 
 
 def _validate_last_syllable(syllable_list):
