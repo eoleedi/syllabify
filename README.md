@@ -8,7 +8,7 @@ Automatically convert plain text into phonemes (US English pronunciation) and sy
 
 Modified from [the repository](https://github.com/cainesap/syllabify) set up by Andrew Caines with some key changes, itemised below:
 
-- Environment management using Poetry
+- Environment management using uv
 - Python 3.10+ compatibility
 - Easy to access class and function interfaces
 - Use up-to-date cmudict versioned by [python-cmudict](https://github.com/prosegrinder/python-cmudict)

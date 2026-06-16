@@ -30,32 +30,31 @@ classifiers = [
   "Programming Language :: Python :: 3.14",
 ]
 requires-python = ">=3.10"
-dynamic = ["dependencies"]
+dependencies = [
+  "cmudict>=1.1.3,<2.0.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/eoleedi/syllabify"
 Repository = "https://github.com/eoleedi/syllabify"
 
-[tool.poetry.dependencies]
-python = "^3.10"
-cmudict = "^1.1.3"
-
-[tool.poetry]
-packages = [{ include = "syllabify" }]
-
-[tool.poetry.group.dev.dependencies]
-pre-commit = "^4.6.0"
-black = "^26.5.1"
-flake8 = "^7.3.0"
-mypy = "^2.1.0"
-pylint = "^4.0.5"
-
-[tool.poetry.scripts]
+[project.scripts]
 syllabify = "syllabify.cli:main"
 
+[dependency-groups]
+dev = [
+  "pre-commit>=4.6.0,<5.0.0",
+  "black>=26.5.1,<27.0.0",
+  "flake8>=7.3.0,<8.0.0",
+  "pylint>=4.0.5,<5.0.0",
+]
+
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling>=1.28.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["syllabify"]
 
 [tool.black]
 line-length = 88
