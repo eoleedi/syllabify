@@ -38,7 +38,6 @@ from syllabify.symbols import (
     R,
 )
 
-
 phoneme_classify = re.compile(
     r"""
                         ((?P<Vowel>AO|UW|EH|AH|AA|IY|IH|UH|AE|AW|AY|ER|EY|OW|OY)
@@ -430,7 +429,7 @@ def handle_possessive(word):
         possessive_suffix = " Z"
 
     # Combine base phonemes with possessive suffix
-    return [base_phoneme_str + possessive_suffix]
+    return base_phoneme_str + possessive_suffix
 
 
 def syllabify(
