@@ -44,9 +44,7 @@ syllabify = "syllabify.cli:main"
 [dependency-groups]
 dev = [
   "pre-commit>=4.6.0,<5.0.0",
-  "black>=26.5.1,<27.0.0",
-  "flake8>=7.3.0,<8.0.0",
-  "pylint>=4.0.5,<5.0.0",
+  "ruff>=0.14.9,<0.15.0",
 ]
 
 [build-system]
@@ -56,26 +54,10 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["syllabify"]
 
-[tool.black]
+[tool.ruff]
 line-length = 88
-target-version = ['py39']
-include = '\.pyi?$'
-extend-exclude = '''
-/(
-  # directories
-  \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | build
-  | dist
-)/
-'''
+target-version = "py310"
 
-[tool.mypy]
-python_version = "3.10"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]

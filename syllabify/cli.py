@@ -3,8 +3,9 @@ Command Line Interface for syllabify
 """
 
 import sys
+
 from syllabify.core import syllabify
-from syllabify.syllables import Word, Sentence
+from syllabify.syllables import Sentence, Word
 
 
 def format_syllable(syllable):

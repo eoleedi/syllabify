@@ -5,7 +5,7 @@ Data types for syllabification
 import functools
 from typing import List, Optional, Union
 
-from syllabify.phonemes import Vowel, Consonant
+from syllabify.phonemes import Consonant, Vowel
 
 
 class Cluster:
@@ -316,7 +316,7 @@ class Sentence:
         return len(self.words)
 
 
-class Rime:  # pylint: disable=too-few-public-methods
+class Rime:
     """Rime Class"""
 
     def __init__(

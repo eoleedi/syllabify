@@ -3,44 +3,44 @@ Syllabify main module
 Updated to Python 3 from Python 2 original
 """
 
-import re
 import functools
+import re
 from typing import List
 
 from syllabify.cmu_parser import cmu_transcribe
-from syllabify.syllables import Cluster, Syllable, Word, Sentence
-from syllabify.phonemes import Vowel, Consonant
+from syllabify.phonemes import Consonant, Vowel
+from syllabify.syllables import Cluster, Sentence, Syllable, Word
 from syllabify.symbols import (
-    AO,
-    EH,
-    AH,
     AA,
-    IH,
-    UH,
     AE,
-    NG,
-    W,
-    Y,
-    S,
+    AH,
+    AO,
     CH,
-    JH,
     DH,
-    F,
+    EH,
+    IH,
+    JH,
+    NG,
     SH,
     TH,
-    V,
+    UH,
     ZH,
-    Z,
     B,
     D,
+    F,
     G,
     K,
-    P,
-    T,
+    L,
     M,
     N,
-    L,
+    P,
     R,
+    S,
+    T,
+    V,
+    W,
+    Y,
+    Z,
 )
 
 UNREDUCED_SHORT_VOWELS = {AO, EH, AH, AA, IH, UH, AE}
@@ -226,7 +226,7 @@ def factory(phoneme):
     return _validate_last_syllable(syllable_list)
 
 
-def onset_rules(cluster):  # pylint: disable=too-many-branches
+def onset_rules(cluster):
     """checks if the cluster is a valid onset or whether it needs to be split"""
 
     phonemes = map(str, cluster.phonemes)
@@ -396,9 +396,7 @@ def handle_possessive(word):
 def syllabify(
     input_data,
     fallback_fn=None,
-) -> (
-    Sentence | List[Sentence]
-):  # pylint: disable=too-many-branches,too-many-return-statements
+) -> Sentence | List[Sentence]:
     """
     Enhanced syllabify function that supports:
     - Single word (str) -> Sentence object containing one Word

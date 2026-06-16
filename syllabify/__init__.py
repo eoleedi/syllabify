@@ -5,7 +5,7 @@ This package provides tools for phonetic transcription and syllabification
 using the CMU Pronouncing Dictionary.
 """
 
-from importlib.metadata import version, PackageNotFoundError
+from importlib.metadata import PackageNotFoundError, version
 
 try:
     __version__ = version("syllabify")
@@ -14,21 +14,21 @@ except PackageNotFoundError:
 
 # These imports might fail if the files aren't ready yet, so we'll handle gracefully
 try:
+    from syllabify.constants import VOWEL_TYPES
     from syllabify.core import syllabify, transcribe
     from syllabify.phonemes import (
+        Consonant,
         Phoneme,
         Vowel,
-        Consonant,
     )
     from syllabify.syllables import (
         Cluster,
         Empty,
         Rime,
+        Sentence,
         Syllable,
         Word,
-        Sentence,
     )
-    from syllabify.constants import VOWEL_TYPES
 
     __all__ = [
         "syllabify",
