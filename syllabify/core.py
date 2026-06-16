@@ -4,7 +4,6 @@ Updated to Python 3 from Python 2 original
 """
 
 import re
-import copy
 import functools
 from typing import List
 
@@ -20,7 +19,6 @@ from syllabify.symbols import (
     UH,
     AE,
     NG,
-    HH,
     W,
     Y,
     S,
@@ -144,16 +142,15 @@ def _create_syllable(syllable_list, cluster):
             push(new_syllable)
             return syllable_list
         if syllable.coda_is_empty():
+            # Avoid leaving a stressed short vowel in an open syllable (e.g. lemma).
             if _has_stressed_short_nucleus(syllable) and len(cluster.phonemes) == 1:
                 maximal_coda, maximal_onset = cluster, None
             else:
-                # Onset Maximalism dictates we push consonant clusters to
-                # the onset of the next syllable, unless the nuclear cluster is LIGHT and
-                # has primary stress
+                # Otherwise, use onset maximization subject to English onset constraints.
                 maximal_coda, maximal_onset = onset_rules(cluster)
 
-            # AC 2017-09-15: removed ambisyllabicity as a theoretical stance
-            # add cluster only to the next syllable
+            # AC 2017-09-15: removed ambisyllabicity as a theoretical stance.
+            # Split clusters into coda/onset parts instead of sharing consonants.
             if maximal_coda:
                 syllable.coda = maximal_coda
                 push(syllable)
@@ -227,65 +224,6 @@ def factory(phoneme):
 
     # Validate last syllable, and return completed syllable list
     return _validate_last_syllable(syllable_list)
-
-
-def coda_rules(cluster):
-    """checks if the cluster is a valid onset or whether it needs to be split"""
-
-    coda_cluster = copy.deepcopy(cluster)
-    phonemes = map(str, coda_cluster.phonemes)
-    phonemelist = list(
-        phonemes
-    )  # grabbed list of phonemes to move away from Py3 map problem, and strip trailing spaces
-    list_of_phonemes = []
-    for phone in phonemelist:
-        list_of_phonemes.append(phone.rstrip())
-
-    def _split_and_update(phoneme, phonemes=None, cluster=None):
-        if phonemes is None:
-            phonemes = list_of_phonemes.copy()
-        if cluster is None:
-            cluster = coda_cluster
-        index = phonemes.index(phoneme)
-        # split on phoneme and discard the rest
-        head = cluster.phonemes[: index - 1]
-        # update cluster
-        cluster.phonemes = head
-        # update string list
-        phonemes = phonemes[: index - 1]
-
-        return (phonemes, cluster)
-
-    # rule 1 - no /HH/ in coda
-    if HH in list_of_phonemes:
-        list_of_phonemes, coda_cluster = _split_and_update("HH")
-
-    # rule 2 - no glides in coda
-    # if L in list_of_phonemes:  # commented out by AC
-    #     list_of_phonemes, coda_cluster = _split_and_update('L')
-
-    # if R in list_of_phonemes:  # commented out by AC
-    #     list_of_phonemes, coda_cluster = _split_and_update('R')
-
-    if W in list_of_phonemes:
-        list_of_phonemes, coda_cluster = _split_and_update("W")
-
-    if Y in list_of_phonemes:
-        list_of_phonemes, coda_cluster = _split_and_update("Y")
-
-    # rule 3 - if complex coda second consonant must not be
-    # /NG/ /ZH/ /DH/
-    if len(list_of_phonemes) > 1 and list_of_phonemes[1] in [NG, DH, ZH]:
-        phoneme = coda_cluster.phonemes[1]
-        # update cluster
-        coda_cluster.phonemes = [phoneme]
-        # update string list
-        phonemes = list_of_phonemes[0:1]
-
-    if coda_cluster.phonemes == []:
-        coda_cluster = None
-
-    return coda_cluster
 
 
 def onset_rules(cluster):  # pylint: disable=too-many-branches
