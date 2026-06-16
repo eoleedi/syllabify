@@ -32,8 +32,6 @@ jobs:
       uses: actions/setup-python@v6
       with:
         python-version: '3.x'
-    - name: Install Dependencies
-      run: uv sync --locked --no-dev
     - name: Build package
       run: SOURCE_DATE_EPOCH=$(date +%s) uv build
     - name: Publish package
