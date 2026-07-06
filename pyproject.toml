@@ -3,8 +3,8 @@ name = "syllabify"
 version = "0.5.1"
 description = "Automatically convert plain text into phonemes (US English pronunciation) and syllabify"
 authors = [
-  { name = "Fong-Chun Tsai", email = "eoleedimin@gmail.com" },
-  { name = "Andrew Caines", email = "cainesap@gmail.com" },
+  { name = "Fong-Chun Tsai" },
+  { name = "Andrew Caines" },
   { name = "Anthony Evans" },
 ]
 license = "MIT"
